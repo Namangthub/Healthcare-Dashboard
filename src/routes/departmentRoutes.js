@@ -27,15 +27,9 @@ import {
 } from "../controllers/departmentController.js";
  
 const router = express.Router();
- 
-// ✅ Get all departments
 
 router.get("/", getAllDepartments);
- 
-// ✅ Get department by ID
-
-router.get("/:id", getDepartmentById);
- 
+router.get("/:id", getDepartmentById); 
 router.get("/name/:name", getDepartmentByName);
 router.get("/:id/doctors", getDoctorsInDepartment);
 router.get("/:id/patients", getPatientsInDepartment);

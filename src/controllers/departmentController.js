@@ -4,7 +4,7 @@ import db from "../config/db.js";
 
 export const getAllDepartments = (req, res, next) => {
 
-  const sql = "SELECT * FROM departments ORDER BY department_name ASC";
+  const sql = "SELECT * FROM departments ORDER BY dept_name ASC";
 
   db.query(sql, (err, result) => {
 
@@ -42,7 +42,7 @@ export const getDepartmentByName = (req, res, next) => {
 
   const { name } = req.params;
 
-  const sql = "SELECT * FROM departments WHERE department_name LIKE ?";
+  const sql = "SELECT * FROM departments WHERE dept_name LIKE ?";
 
   db.query(sql, [`%${name}%`], (err, result) => {
 
@@ -164,7 +164,7 @@ export const getDepartmentStats = (req, res, next) => {
 
     SELECT 
 
-      d.department_name,
+      d.dept_name,
 
       COUNT(DISTINCT doc.doctor_id) AS total_doctors,
 
@@ -198,7 +198,7 @@ export const getTopDepartmentsByAppointments = (req, res, next) => {
 
   const sql = `
 
-    SELECT d.department_name, COUNT(a.appointment_id) AS total_appointments
+    SELECT d.dept_name, COUNT(a.appointment_id) AS total_appointments
 
     FROM departments d
 
@@ -258,7 +258,7 @@ export const getDepartmentCapacity = (req, res, next) => {
 
     SELECT 
 
-      d.department_name,
+      d.dept_name,
 
       d.total_beds,
 

@@ -10,14 +10,12 @@ import {
 
   getDoctorsByName,
 
-  getAvailableDoctors,
-
-  getDoctorsByExperience
-
+  getAvailableDoctors
 } from "../controllers/doctorController.js";
  
 const router = express.Router();
  
+
 
 router.get("/department/:department", getDoctorsByDepartment);
 
