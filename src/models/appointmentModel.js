@@ -1,3 +1,4 @@
+// src/models/AppointmentModel.js
 import db from '../config/db.js';
 
 const AppointmentModel = {
@@ -15,10 +16,10 @@ const AppointmentModel = {
         a.doctor_name AS doctorName
       FROM appointments a
       LEFT JOIN patients p ON a.patient_id = p.id
-      ORDER BY a.date DESC, a.time DESC
+      ORDER BY a.date DESC, a.time DESC;
     `;
-    const [results] = await db.query(query);
-    return results;
+    const [rows] = await db.query(query);
+    return rows;
   },
 
   // Get appointments for a specific day
@@ -36,34 +37,54 @@ const AppointmentModel = {
       FROM appointments a
       LEFT JOIN patients p ON a.patient_id = p.id
       WHERE a.date = ?
-      ORDER BY a.time ASC
+      ORDER BY a.time ASC;
     `;
-    const [results] = await db.query(query, [date]);
-    return results;
+    const [rows] = await db.query(query, [date]);
+    return rows;
   },
 
   // Get appointments for a specific patient
   async getPatientAppointments(patientId) {
     const query = `
       SELECT 
-        id, date, time, status, type, doctor_name AS doctorName
+        id, 
+        date, 
+        time, 
+        status, 
+        type, 
+        doctor_name AS doctorName
       FROM appointments
       WHERE patient_id = ?
-      ORDER BY date DESC, time DESC
+      ORDER BY date DESC, time DESC;
     `;
-    const [results] = await db.query(query, [patientId]);
-    return results;
+    const [rows] = await db.query(query, [patientId]);
+    return rows;
   },
 
   // Create a new appointment
   async createAppointment(data) {
     const query = `
       INSERT INTO appointments (patient_id, date, time, type, status, doctor_name)
-      VALUES (?, ?, ?, ?, 'Scheduled', ?)
+      VALUES (?, ?, ?, ?, 'Scheduled', ?);
     `;
-    const values = [data.patientId, data.date, data.time, data.type, data.doctorName || 'Unassigned'];
+    const values = [
+      data.patientId,
+      data.date,
+      data.time,
+      data.type,
+      data.doctorName || 'Unassigned'
+    ];
     const [result] = await db.query(query, values);
-    return { id: result.insertId, ...data, status: 'Scheduled' };
+
+    return {
+      id: result.insertId,
+      patientId: data.patientId,
+      date: data.date,
+      time: data.time,
+      type: data.type,
+      doctorName: data.doctorName || 'Unassigned',
+      status: 'Scheduled'
+    };
   },
 
   // Update appointment status
@@ -71,7 +92,7 @@ const AppointmentModel = {
     const query = `
       UPDATE appointments
       SET status = ?
-      WHERE id = ?
+      WHERE id = ?;
     `;
     await db.query(query, [status, id]);
     return true;
@@ -85,7 +106,7 @@ const AppointmentModel = {
         SUM(status = 'Completed') AS completed,
         SUM(status = 'Cancelled') AS cancelled
       FROM appointments
-      WHERE MONTH(date) = ? AND YEAR(date) = ?
+      WHERE MONTH(date) = ? AND YEAR(date) = ?;
     `;
     const [rows] = await db.query(query, [month, year]);
     return rows[0];
@@ -99,10 +120,10 @@ const AppointmentModel = {
         COUNT(*) AS count
       FROM appointments
       GROUP BY type
-      ORDER BY count DESC
+      ORDER BY count DESC;
     `;
-    const [results] = await db.query(query);
-    return results;
+    const [rows] = await db.query(query);
+    return rows;
   }
 };
 

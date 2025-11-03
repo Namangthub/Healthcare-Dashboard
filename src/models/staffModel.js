@@ -1,6 +1,6 @@
 import db from '../config/db.js';
 
-// ✅ Staff Model for database operations
+// ✅ Staff Model for database operations (MySQL compatible)
 const StaffModel = {
   // Get all staff
   async getAllStaff() {
@@ -10,8 +10,8 @@ const StaffModel = {
       LEFT JOIN departments d ON s.department_id = d.id
       ORDER BY s.id;
     `;
-    const result = await db.query(query);
-    return result.rows;
+    const [result] = await db.query(query);
+    return result;
   },
 
   // Get staff by ID
@@ -20,10 +20,10 @@ const StaffModel = {
       SELECT s.*, d.name AS department_name
       FROM staff s
       LEFT JOIN departments d ON s.department_id = d.id
-      WHERE s.id = $1;
+      WHERE s.id = ?;
     `;
-    const result = await db.query(query, [id]);
-    return result.rows[0];
+    const [result] = await db.query(query, [id]);
+    return result[0];
   },
 
   // Get staff by department
@@ -32,11 +32,11 @@ const StaffModel = {
       SELECT s.*, d.name AS department_name
       FROM staff s
       LEFT JOIN departments d ON s.department_id = d.id
-      WHERE s.department_id = $1
+      WHERE s.department_id = ?
       ORDER BY s.id;
     `;
-    const result = await db.query(query, [departmentId]);
-    return result.rows;
+    const [result] = await db.query(query, [departmentId]);
+    return result;
   },
 
   // Update staff status
@@ -48,12 +48,14 @@ const StaffModel = {
 
     const query = `
       UPDATE staff
-      SET status = $1::staff_status
-      WHERE id = $2
-      RETURNING *;
+      SET status = ?
+      WHERE id = ?;
     `;
-    const result = await db.query(query, [status, id]);
-    return result.rows[0];
+    await db.query(query, [status, id]);
+
+    // MySQL doesn't support RETURNING *, so fetch updated record manually
+    const [updated] = await db.query('SELECT * FROM staff WHERE id = ?;', [id]);
+    return updated[0];
   },
 
   // Get staff count by role
@@ -64,8 +66,8 @@ const StaffModel = {
       GROUP BY role
       ORDER BY count DESC;
     `;
-    const result = await db.query(query);
-    return result.rows;
+    const [result] = await db.query(query);
+    return result;
   },
 
   // Get staff count by department
@@ -77,8 +79,8 @@ const StaffModel = {
       GROUP BY d.name
       ORDER BY count DESC;
     `;
-    const result = await db.query(query);
-    return result.rows;
+    const [result] = await db.query(query);
+    return result;
   },
 
   // Get patients assigned to staff
@@ -87,12 +89,12 @@ const StaffModel = {
       SELECT p.*, d.name AS department_name
       FROM patients p
       LEFT JOIN departments d ON p.department_id = d.id
-      WHERE p.doctor_id = $1
+      WHERE p.doctor_id = ?
       ORDER BY p.id;
     `;
-    const result = await db.query(query, [staffId]);
-    return result.rows;
-  }
+    const [result] = await db.query(query, [staffId]);
+    return result;
+  },
 };
 
 export default StaffModel;

@@ -5,8 +5,9 @@ const InventoryModel = {
   // Get all medical supplies
   getMedicalSupplies: async () => {
     const query = `SELECT * FROM inventory_supplies ORDER BY item_name ASC`;
-    const result = await db.query(query);
-    return result.rows.map(item => ({
+    const [rows] = await db.query(query);
+
+    return rows.map(item => ({
       item: item.item_name,
       current: item.current_quantity,
       minimum: item.minimum_quantity,
@@ -18,8 +19,9 @@ const InventoryModel = {
   // Get all equipment
   getEquipment: async () => {
     const query = `SELECT * FROM inventory_equipment ORDER BY equipment_name ASC`;
-    const result = await db.query(query);
-    return result.rows.map(item => ({
+    const [rows] = await db.query(query);
+
+    return rows.map(item => ({
       equipment: item.equipment_name,
       status: item.status,
       lastMaintenance: item.last_maintenance,
@@ -38,10 +40,15 @@ const InventoryModel = {
 
   // Update medical supplies
   updateSupplies: async (itemName, quantity) => {
-    const query = `UPDATE inventory_supplies SET current_quantity=$1 WHERE item_name=$2 RETURNING *`;
-    const result = await db.query(query, [quantity, itemName]);
-    if (!result.rows.length) throw new Error(`Medical supply '${itemName}' not found`);
-    const item = result.rows[0];
+    const updateQuery = `UPDATE inventory_supplies SET current_quantity = ? WHERE item_name = ?`;
+    const [result] = await db.query(updateQuery, [quantity, itemName]);
+
+    if (result.affectedRows === 0) throw new Error(`Medical supply '${itemName}' not found`);
+
+    // Fetch updated item
+    const [rows] = await db.query(`SELECT * FROM inventory_supplies WHERE item_name = ?`, [itemName]);
+    const item = rows[0];
+
     return {
       item: item.item_name,
       current: item.current_quantity,
@@ -55,10 +62,15 @@ const InventoryModel = {
   updateEquipmentStatus: async (equipmentName, status) => {
     const validStatuses = ['Operational', 'Maintenance', 'Out of Service'];
     if (!validStatuses.includes(status)) throw new Error(`Invalid status: ${status}`);
-    const query = `UPDATE inventory_equipment SET status=$1 WHERE equipment_name=$2 RETURNING *`;
-    const result = await db.query(query, [status, equipmentName]);
-    if (!result.rows.length) throw new Error(`Equipment '${equipmentName}' not found`);
-    const item = result.rows[0];
+
+    const updateQuery = `UPDATE inventory_equipment SET status = ? WHERE equipment_name = ?`;
+    const [result] = await db.query(updateQuery, [status, equipmentName]);
+
+    if (result.affectedRows === 0) throw new Error(`Equipment '${equipmentName}' not found`);
+
+    const [rows] = await db.query(`SELECT * FROM inventory_equipment WHERE equipment_name = ?`, [equipmentName]);
+    const item = rows[0];
+
     return {
       equipment: item.equipment_name,
       status: item.status,
@@ -69,15 +81,18 @@ const InventoryModel = {
 
   // Update equipment maintenance
   updateEquipmentMaintenance: async (equipmentName, lastMaintenance, nextMaintenance) => {
-    const query = `
+    const updateQuery = `
       UPDATE inventory_equipment
-      SET last_maintenance=$1, next_maintenance=$2
-      WHERE equipment_name=$3
-      RETURNING *
+      SET last_maintenance = ?, next_maintenance = ?
+      WHERE equipment_name = ?
     `;
-    const result = await db.query(query, [lastMaintenance, nextMaintenance, equipmentName]);
-    if (!result.rows.length) throw new Error(`Equipment '${equipmentName}' not found`);
-    const item = result.rows[0];
+    const [result] = await db.query(updateQuery, [lastMaintenance, nextMaintenance, equipmentName]);
+
+    if (result.affectedRows === 0) throw new Error(`Equipment '${equipmentName}' not found`);
+
+    const [rows] = await db.query(`SELECT * FROM inventory_equipment WHERE equipment_name = ?`, [equipmentName]);
+    const item = rows[0];
+
     return {
       equipment: item.equipment_name,
       status: item.status,
@@ -92,10 +107,11 @@ const InventoryModel = {
       SELECT *
       FROM inventory_supplies
       WHERE current_quantity <= minimum_quantity
-      ORDER BY (current_quantity::float / minimum_quantity::float) ASC
+      ORDER BY (current_quantity / minimum_quantity) ASC
     `;
-    const result = await db.query(query);
-    return result.rows.map(item => ({
+    const [rows] = await db.query(query);
+
+    return rows.map(item => ({
       item: item.item_name,
       current: item.current_quantity,
       minimum: item.minimum_quantity,
@@ -110,11 +126,12 @@ const InventoryModel = {
     const query = `
       SELECT *
       FROM inventory_equipment
-      WHERE next_maintenance <= $1
+      WHERE next_maintenance <= ?
       ORDER BY next_maintenance ASC
     `;
-    const result = await db.query(query, [today]);
-    return result.rows.map(item => ({
+    const [rows] = await db.query(query, [today]);
+
+    return rows.map(item => ({
       equipment: item.equipment_name,
       status: item.status,
       lastMaintenance: item.last_maintenance,

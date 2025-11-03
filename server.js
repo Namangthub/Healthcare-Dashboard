@@ -54,7 +54,7 @@ app.use('/api/activities', activitiesRoutes);
 app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 47815;
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);

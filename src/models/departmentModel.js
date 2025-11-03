@@ -6,14 +6,17 @@ export const DepartmentModel = {
   getAllDepartments: async () => {
     try {
       const query = `
-        SELECT d.*, 
-               ds.doctors, ds.nurses, ds.support
+        SELECT 
+          d.*, 
+          ds.doctors, 
+          ds.nurses, 
+          ds.support
         FROM departments d
         LEFT JOIN department_staff ds ON d.id = ds.department_id
-        ORDER BY d.id
+        ORDER BY d.id;
       `;
-      const result = await db.query(query);
-      return result.rows; // Return raw data without transformation
+      const [rows] = await db.query(query);
+      return rows;
     } catch (error) {
       throw new Error(`Error getting departments: ${error.message}`);
     }
@@ -23,19 +26,17 @@ export const DepartmentModel = {
   getDepartmentById: async (id) => {
     try {
       const query = `
-        SELECT d.*, 
-               ds.doctors, ds.nurses, ds.support
+        SELECT 
+          d.*, 
+          ds.doctors, 
+          ds.nurses, 
+          ds.support
         FROM departments d
         LEFT JOIN department_staff ds ON d.id = ds.department_id
-        WHERE d.id = $1
+        WHERE d.id = ?;
       `;
-      const result = await db.query(query, [id]);
-      
-      if (result.rows.length === 0) {
-        return null;
-      }
-      
-      return result.rows[0]; // Return raw data without transformation
+      const [rows] = await db.query(query, [id]);
+      return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       throw new Error(`Error getting department: ${error.message}`);
     }
@@ -47,10 +48,10 @@ export const DepartmentModel = {
       const query = `
         SELECT revenue, percentage
         FROM department_financials
-        WHERE department_id = $1
+        WHERE department_id = ?;
       `;
-      const result = await db.query(query, [id]);
-      return result.rows.length > 0 ? result.rows[0] : null;
+      const [rows] = await db.query(query, [id]);
+      return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       throw new Error(`Error getting department financials: ${error.message}`);
     }
@@ -61,20 +62,20 @@ export const DepartmentModel = {
     try {
       const query = `
         SELECT 
-          qps.score as satisfaction_score, 
-          qps.responses as satisfaction_responses,
-          qwt.avg_wait as wait_time_avg,
-          qwt.target as wait_time_target,
-          qrr.rate as readmission_rate,
-          qrr.target as readmission_target
+          qps.score AS satisfaction_score, 
+          qps.responses AS satisfaction_responses,
+          qwt.avg_wait AS wait_time_avg,
+          qwt.target AS wait_time_target,
+          qrr.rate AS readmission_rate,
+          qrr.target AS readmission_target
         FROM departments d
         LEFT JOIN quality_patient_satisfaction qps ON d.id = qps.department_id
         LEFT JOIN quality_wait_times qwt ON d.id = qwt.department_id
         LEFT JOIN quality_readmission_rates qrr ON d.id = qrr.department_id
-        WHERE d.id = $1
+        WHERE d.id = ?;
       `;
-      const result = await db.query(query, [id]);
-      return result.rows.length > 0 ? result.rows[0] : null;
+      const [rows] = await db.query(query, [id]);
+      return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       throw new Error(`Error getting department quality metrics: ${error.message}`);
     }
@@ -84,12 +85,12 @@ export const DepartmentModel = {
   getDepartmentStaffCount: async (id) => {
     try {
       const query = `
-        SELECT COUNT(*) as total_staff
+        SELECT COUNT(*) AS total_staff
         FROM staff
-        WHERE department_id = $1
+        WHERE department_id = ?;
       `;
-      const result = await db.query(query, [id]);
-      return result.rows.length > 0 ? parseInt(result.rows[0].total_staff) : 0;
+      const [rows] = await db.query(query, [id]);
+      return rows.length > 0 ? parseInt(rows[0].total_staff) : 0;
     } catch (error) {
       throw new Error(`Error getting department staff count: ${error.message}`);
     }
@@ -99,12 +100,12 @@ export const DepartmentModel = {
   getDepartmentPatientCount: async (id) => {
     try {
       const query = `
-        SELECT COUNT(*) as total_patients
+        SELECT COUNT(*) AS total_patients
         FROM patients
-        WHERE department_id = $1
+        WHERE department_id = ?;
       `;
-      const result = await db.query(query, [id]);
-      return result.rows.length > 0 ? parseInt(result.rows[0].total_patients) : 0;
+      const [rows] = await db.query(query, [id]);
+      return rows.length > 0 ? parseInt(rows[0].total_patients) : 0;
     } catch (error) {
       throw new Error(`Error getting department patient count: ${error.message}`);
     }

@@ -15,8 +15,8 @@ export default class PatientModel {
         LEFT JOIN departments d ON p.department_id = d.id
         LEFT JOIN staff s ON p.doctor_id = s.id
       `;
-      const result = await db.query(query);
-      return result.rows;
+      const [rows] = await db.query(query);
+      return rows;
     } catch (error) {
       console.error('Error getting all patients:', error);
       throw error;
@@ -38,32 +38,36 @@ export default class PatientModel {
             d.name AS department_name,
             s.full_name AS doctor_name,
             COALESCE(
-              json_build_object(
+              JSON_OBJECT(
                 'bloodPressure', pv.blood_pressure,
                 'heartRate', pv.heart_rate,
                 'temperature', pv.temperature,
                 'oxygenSaturation', pv.oxygen_saturation
               ),
-              '{}'::json
+              JSON_OBJECT()
             ) AS vitals,
             COALESCE(
-              (SELECT json_agg(m.medication_name) FROM patient_medications m WHERE m.patient_id = p.id),
-              '[]'::json
+              (SELECT JSON_ARRAYAGG(m.medication_name) 
+               FROM patient_medications m 
+               WHERE m.patient_id = p.id),
+              JSON_ARRAY()
             ) AS medications,
             COALESCE(
-              (SELECT json_agg(a.allergy_name) FROM patient_allergies a WHERE a.patient_id = p.id),
-              '[]'::json
+              (SELECT JSON_ARRAYAGG(a.allergy_name) 
+               FROM patient_allergies a 
+               WHERE a.patient_id = p.id),
+              JSON_ARRAY()
             ) AS allergies
           FROM patients p
           LEFT JOIN departments d ON p.department_id = d.id
           LEFT JOIN staff s ON p.doctor_id = s.id
           LEFT JOIN patient_vitals_current pv ON pv.patient_id = p.id
-          WHERE p.id = $1
+          WHERE p.id = ?
         `;
 
-        const result = await db.query(query, [patId]);
-        if (result.rows.length > 0) {
-          return result.rows[0];
+        const [rows] = await db.query(query, [patId]);
+        if (rows.length > 0) {
+          return rows[0];
         }
       }
 
@@ -95,9 +99,19 @@ export default class PatientModel {
           p.next_appointment,
           p.room,
           p.diagnosis,
-          COALESCE(json_agg(DISTINCT pa.allergy_name) FILTER (WHERE pa.allergy_name IS NOT NULL), '[]') AS allergies,
-          COALESCE(json_agg(DISTINCT pm.medication_name) FILTER (WHERE pm.medication_name IS NOT NULL), '[]') AS medications,
-          jsonb_build_object(
+          COALESCE(
+            (SELECT JSON_ARRAYAGG(DISTINCT pa.allergy_name) 
+             FROM patient_allergies pa 
+             WHERE pa.patient_id = p.id),
+            JSON_ARRAY()
+          ) AS allergies,
+          COALESCE(
+            (SELECT JSON_ARRAYAGG(DISTINCT pm.medication_name) 
+             FROM patient_medications pm 
+             WHERE pm.patient_id = p.id),
+            JSON_ARRAY()
+          ) AS medications,
+          JSON_OBJECT(
             'bloodPressure', pv.blood_pressure,
             'heartRate', pv.heart_rate,
             'temperature', pv.temperature,
@@ -106,20 +120,18 @@ export default class PatientModel {
         FROM patients p
         LEFT JOIN departments d ON p.department_id = d.id
         LEFT JOIN staff s ON p.doctor_id = s.id
-        LEFT JOIN patient_allergies pa ON pa.patient_id = p.id
-        LEFT JOIN patient_medications pm ON pm.patient_id = p.id
         LEFT JOIN patient_vitals_current pv ON pv.patient_id = p.id
-        WHERE p.id = $1
+        WHERE p.id = ?
         GROUP BY p.id, d.name, s.full_name, pv.blood_pressure, pv.heart_rate, pv.temperature, pv.oxygen_saturation
       `;
 
-      const result = await db.query(query, [id]);
-      if (result.rows.length === 0) {
+      const [rows] = await db.query(query, [id]);
+      if (rows.length === 0) {
         console.log(`Patient ${id} not found in database`);
         return null;
       }
 
-      return result.rows[0];
+      return rows[0];
     } catch (error) {
       console.error(`Error getting secure patient with id ${id}:`, error);
       throw error;
@@ -144,7 +156,7 @@ export default class PatientModel {
           p.next_appointment,
           p.room,
           p.diagnosis,
-          jsonb_build_object(
+          JSON_OBJECT(
             'bloodPressure', pv.blood_pressure,
             'heartRate', pv.heart_rate,
             'temperature', pv.temperature,
@@ -164,8 +176,8 @@ export default class PatientModel {
           END, 
           p.id ASC
       `;
-      const result = await db.query(query);
-      return result.rows;
+      const [rows] = await db.query(query);
+      return rows;
     } catch (error) {
       console.error('Error getting all secure patients:', error);
       throw error;
@@ -231,4 +243,3 @@ export default class PatientModel {
     };
   }
 }
-

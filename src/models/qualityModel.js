@@ -1,48 +1,49 @@
 import db from '../config/db.js';
 
-// ✅ Quality Metrics Model
+// ✅ Quality Metrics Model (MySQL-compatible)
 export const QualityModel = {
   // Get all quality metrics
   async getAllQualityMetrics() {
     try {
       const satisfactionQuery = `
         SELECT AVG(score) AS overall_satisfaction
-        FROM quality_patient_satisfaction
+        FROM quality_patient_satisfaction;
       `;
       const waitTimesQuery = `
         SELECT AVG(avg_wait) AS overall_wait_time
-        FROM quality_wait_times
+        FROM quality_wait_times;
       `;
       const readmissionQuery = `
         SELECT AVG(rate) AS overall_readmission
-        FROM quality_readmission_rates
+        FROM quality_readmission_rates;
       `;
       const deptSatisfactionQuery = `
         SELECT d.name AS department, qps.score, qps.responses
         FROM quality_patient_satisfaction qps
         JOIN departments d ON d.id = qps.department_id
-        ORDER BY qps.score DESC
+        ORDER BY qps.score DESC;
       `;
       const deptWaitTimesQuery = `
         SELECT d.name AS department, qwt.avg_wait, qwt.target
         FROM quality_wait_times qwt
         JOIN departments d ON d.id = qwt.department_id
-        ORDER BY qwt.avg_wait ASC
+        ORDER BY qwt.avg_wait ASC;
       `;
       const deptReadmissionQuery = `
         SELECT d.name AS department, qrr.rate, qrr.target
         FROM quality_readmission_rates qrr
         JOIN departments d ON d.id = qrr.department_id
-        ORDER BY qrr.rate ASC
+        ORDER BY qrr.rate ASC;
       `;
 
+      // MySQL returns [rows, fields], so use destructuring for each
       const [
-        satisfactionResult,
-        waitTimesResult,
-        readmissionResult,
-        deptSatisfactionResult,
-        deptWaitTimesResult,
-        deptReadmissionResult,
+        [satisfactionResult],
+        [waitTimesResult],
+        [readmissionResult],
+        [deptSatisfactionResult],
+        [deptWaitTimesResult],
+        [deptReadmissionResult],
       ] = await Promise.all([
         db.query(satisfactionQuery),
         db.query(waitTimesQuery),
@@ -54,19 +55,20 @@ export const QualityModel = {
 
       return {
         patientSatisfaction: {
-          overall: parseFloat(satisfactionResult.rows[0]?.overall_satisfaction || 0),
-          byDepartment: deptSatisfactionResult.rows,
+          overall: parseFloat(satisfactionResult[0]?.overall_satisfaction || 0),
+          byDepartment: deptSatisfactionResult,
         },
         waitTimes: {
-          average: parseFloat(waitTimesResult.rows[0]?.overall_wait_time || 0),
-          byDepartment: deptWaitTimesResult.rows,
+          average: parseFloat(waitTimesResult[0]?.overall_wait_time || 0),
+          byDepartment: deptWaitTimesResult,
         },
         readmissionRates: {
-          overall: parseFloat(readmissionResult.rows[0]?.overall_readmission || 0),
-          byDepartment: deptReadmissionResult.rows,
+          overall: parseFloat(readmissionResult[0]?.overall_readmission || 0),
+          byDepartment: deptReadmissionResult,
         },
       };
     } catch (error) {
+      console.error('❌ Error getting quality metrics:', error);
       throw new Error(`Error getting quality metrics: ${error.message}`);
     }
   },
@@ -88,11 +90,13 @@ export const QualityModel = {
         LEFT JOIN quality_patient_satisfaction qps ON d.id = qps.department_id
         LEFT JOIN quality_wait_times qwt ON d.id = qwt.department_id
         LEFT JOIN quality_readmission_rates qrr ON d.id = qrr.department_id
-        WHERE d.id = $1;
+        WHERE d.id = ?;
       `;
-      const result = await db.query(query, [departmentId]);
-      return result.rows[0];
+
+      const [result] = await db.query(query, [departmentId]);
+      return result[0];
     } catch (error) {
+      console.error('❌ Error getting department quality metrics:', error);
       throw new Error(`Error getting department quality metrics: ${error.message}`);
     }
   },
