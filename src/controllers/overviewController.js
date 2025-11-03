@@ -2,24 +2,24 @@
 import db from '../config/db.js';
 
 export const OverviewController = {
-  // ✅ Get all overview statistics
   async getOverviewStatistics(req, res) {
     try {
       const query = `
-        SELECT name, value, unit, category
+        SELECT *
         FROM overview_statistics
-        ORDER BY id
+        ORDER BY date DESC
+        LIMIT 1
       `;
 
-      const result = await db.query(query);
+      const [rows] = await db.query(query);
 
-      // Transform to object structure matching frontend expectations
-      const stats = {};
-      result.rows.forEach(row => {
-        stats[row.name] = parseFloat(row.value);
-      });
+      if (rows.length === 0) {
+        return res.status(404).json({ message: 'No statistics found' });
+      }
 
+      const stats = rows[0]; // The latest record
       res.json(stats);
+
     } catch (error) {
       console.error('Error fetching overview statistics:', error);
       res.status(500).json({
