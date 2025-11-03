@@ -38,69 +38,6 @@ const InventoryModel = {
     return { medical_supplies: supplies, equipment };
   },
 
-  // Update medical supplies
-  updateSupplies: async (itemName, quantity) => {
-    const updateQuery = `UPDATE inventory_supplies SET current_quantity = ? WHERE item_name = ?`;
-    const [result] = await db.query(updateQuery, [quantity, itemName]);
-
-    if (result.affectedRows === 0) throw new Error(`Medical supply '${itemName}' not found`);
-
-    // Fetch updated item
-    const [rows] = await db.query(`SELECT * FROM inventory_supplies WHERE item_name = ?`, [itemName]);
-    const item = rows[0];
-
-    return {
-      item: item.item_name,
-      current: item.current_quantity,
-      minimum: item.minimum_quantity,
-      status: item.current_quantity > item.minimum_quantity ? 'Good' : 'Low',
-      cost: parseFloat(item.unit_cost)
-    };
-  },
-
-  // Update equipment status
-  updateEquipmentStatus: async (equipmentName, status) => {
-    const validStatuses = ['Operational', 'Maintenance', 'Out of Service'];
-    if (!validStatuses.includes(status)) throw new Error(`Invalid status: ${status}`);
-
-    const updateQuery = `UPDATE inventory_equipment SET status = ? WHERE equipment_name = ?`;
-    const [result] = await db.query(updateQuery, [status, equipmentName]);
-
-    if (result.affectedRows === 0) throw new Error(`Equipment '${equipmentName}' not found`);
-
-    const [rows] = await db.query(`SELECT * FROM inventory_equipment WHERE equipment_name = ?`, [equipmentName]);
-    const item = rows[0];
-
-    return {
-      equipment: item.equipment_name,
-      status: item.status,
-      lastMaintenance: item.last_maintenance,
-      nextMaintenance: item.next_maintenance
-    };
-  },
-
-  // Update equipment maintenance
-  updateEquipmentMaintenance: async (equipmentName, lastMaintenance, nextMaintenance) => {
-    const updateQuery = `
-      UPDATE inventory_equipment
-      SET last_maintenance = ?, next_maintenance = ?
-      WHERE equipment_name = ?
-    `;
-    const [result] = await db.query(updateQuery, [lastMaintenance, nextMaintenance, equipmentName]);
-
-    if (result.affectedRows === 0) throw new Error(`Equipment '${equipmentName}' not found`);
-
-    const [rows] = await db.query(`SELECT * FROM inventory_equipment WHERE equipment_name = ?`, [equipmentName]);
-    const item = rows[0];
-
-    return {
-      equipment: item.equipment_name,
-      status: item.status,
-      lastMaintenance: item.last_maintenance,
-      nextMaintenance: item.next_maintenance
-    };
-  },
-
   // Low stock items
   getLowStockItems: async () => {
     const query = `

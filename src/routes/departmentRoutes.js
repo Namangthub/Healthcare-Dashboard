@@ -13,9 +13,6 @@ router.get('/stats', OverviewController.getOverviewStatistics);
 // Get a department by ID
 router.get('/:id', DepartmentController.getDepartmentById);
 
-// Get enhanced department data
-router.get('/:id/enhanced', DepartmentController.getEnhancedDepartment);
-
 // Get staff in a department
 router.get('/:id/staff', DepartmentController.getDepartmentStaff);
 

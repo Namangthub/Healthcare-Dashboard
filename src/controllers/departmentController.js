@@ -33,31 +33,6 @@ export const DepartmentController = {
     }
   },
  
-  // Get enhanced department data
-  async getEnhancedDepartment(req, res) {
-    try {
-      const { id } = req.params;
-      const department = await DepartmentModel.getDepartmentById(id);
-      if (!department) return res.status(404).json({ message: `Department with id ${id} not found` });
- 
-      const [financial, quality] = await Promise.all([
-        DepartmentModel.getDepartmentFinancials(id),
-        DepartmentModel.getDepartmentQualityMetrics(id)
-      ]);
- 
-      const enhancedDepartment = {
-        department: transformDepartment(department),
-        financial: transformFinancial(financial),
-        quality: transformQualityMetrics(quality)
-      };
- 
-      res.json(enhancedDepartment);
-    } catch (error) {
-      console.error('Error fetching enhanced department:', error);
-      res.status(500).json({ message: 'Failed to fetch enhanced department', error: error.message });
-    }
-  },
- 
   // Get department staff
   async getDepartmentStaff(req, res) {
     try {
@@ -67,7 +42,7 @@ export const DepartmentController = {
  
       const query = `
         SELECT s.id, s.first_name, s.last_name, s.full_name, s.role,
-               s.status, s.shift, s.specialty, s.experience, s.patients, s.rating
+               s.status, s.shift, s.specialty, s.experience, s.rating
         FROM staff s
         WHERE s.department_id = ?
         ORDER BY s.role, s.last_name;
