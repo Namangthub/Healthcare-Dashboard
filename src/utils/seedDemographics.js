@@ -1,8 +1,11 @@
-const db = require('../config/db');
-const path = require('path');
-require('dotenv').config();
+// seeders/seedDemographics.js
+import db from '../config/db.js';
+import path from 'path';
+import dotenv from 'dotenv';
 
-// Define the healthcare data directly to avoid import issues
+dotenv.config();
+
+// Healthcare demographic data
 const healthcareData = {
   demographics: {
     byAge: [
@@ -28,15 +31,14 @@ const healthcareData = {
   }
 };
 
-async function seedDemographics() {
+export async function seedDemographics() {
   const client = await db.pool.connect();
-  
+
   try {
-    console.log('Starting demographics seeding...');
-    
+    console.log('🌱 Starting demographics seeding...');
     await client.query('BEGIN');
 
-    // Age demographics
+    // --- Create Tables ---
     await client.query(`
       CREATE TABLE IF NOT EXISTS demographics_age (
         id SERIAL PRIMARY KEY,
@@ -50,7 +52,6 @@ async function seedDemographics() {
       );
     `);
 
-    // Gender demographics
     await client.query(`
       CREATE TABLE IF NOT EXISTS demographics_gender (
         id SERIAL PRIMARY KEY,
@@ -63,7 +64,6 @@ async function seedDemographics() {
       );
     `);
 
-    // Insurance demographics
     await client.query(`
       CREATE TABLE IF NOT EXISTS demographics_insurance (
         id SERIAL PRIMARY KEY,
@@ -76,76 +76,62 @@ async function seedDemographics() {
       );
     `);
 
-    // Clear existing data
+    // --- Clear existing data ---
     await client.query('TRUNCATE demographics_age RESTART IDENTITY CASCADE');
     await client.query('TRUNCATE demographics_gender RESTART IDENTITY CASCADE');
     await client.query('TRUNCATE demographics_insurance RESTART IDENTITY CASCADE');
-    
-    // Insert age demographics
+
+    // --- Insert data ---
     for (const item of healthcareData.demographics.byAge) {
-      await client.query(`
-        INSERT INTO demographics_age (age_group, label, count, percentage, color)
-        VALUES ($1, $2, $3, $4, $5)
-      `, [
-        item.ageGroup,
-        item.label,
-        item.count,
-        item.percentage,
-        item.color
-      ]);
+      await client.query(
+        `INSERT INTO demographics_age (age_group, label, count, percentage, color)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [item.ageGroup, item.label, item.count, item.percentage, item.color]
+      );
     }
-    console.log(`Added ${healthcareData.demographics.byAge.length} age demographic records`);
-    
-    // Insert gender demographics
+
+    console.log(`✅ Inserted ${healthcareData.demographics.byAge.length} age records`);
+
     for (const item of healthcareData.demographics.byGender) {
-      await client.query(`
-        INSERT INTO demographics_gender (gender, count, percentage, color)
-        VALUES ($1, $2, $3, $4)
-      `, [
-        item.gender,
-        item.count,
-        item.percentage,
-        item.color
-      ]);
+      await client.query(
+        `INSERT INTO demographics_gender (gender, count, percentage, color)
+         VALUES ($1, $2, $3, $4)`,
+        [item.gender, item.count, item.percentage, item.color]
+      );
     }
-    console.log(`Added ${healthcareData.demographics.byGender.length} gender demographic records`);
-    
-    // Insert insurance demographics
+
+    console.log(`✅ Inserted ${healthcareData.demographics.byGender.length} gender records`);
+
     for (const item of healthcareData.demographics.byInsurance) {
-      await client.query(`
-        INSERT INTO demographics_insurance (type, count, percentage, color)
-        VALUES ($1, $2, $3, $4)
-      `, [
-        item.type,
-        item.count,
-        item.percentage,
-        item.color
-      ]);
+      await client.query(
+        `INSERT INTO demographics_insurance (type, count, percentage, color)
+         VALUES ($1, $2, $3, $4)`,
+        [item.type, item.count, item.percentage, item.color]
+      );
     }
-    console.log(`Added ${healthcareData.demographics.byInsurance.length} insurance demographic records`);
+
+    console.log(`✅ Inserted ${healthcareData.demographics.byInsurance.length} insurance records`);
 
     await client.query('COMMIT');
-    console.log('Demographics data seeded successfully!');
+    console.log('🎉 Demographics data seeded successfully!');
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error seeding demographics data:', error);
+    console.error('❌ Error seeding demographics data:', error);
     throw error;
   } finally {
     client.release();
   }
 }
 
-// Run directly if called from command line
-if (require.main === module) {
+// 🧩 Allow running directly via CLI
+if (import.meta.url === `file://${process.argv[1]}`) {
   seedDemographics()
     .then(() => {
-      console.log('Demographics seeding complete');
+      console.log('✅ Seeding complete');
       process.exit(0);
     })
-    .catch(err => {
-      console.error('Demographics seeding error:', err);
+    .catch((err) => {
+      console.error('❌ Seeding error:', err);
       process.exit(1);
     });
 }
-
-module.exports = seedDemographics;

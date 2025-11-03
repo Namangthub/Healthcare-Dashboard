@@ -1,34 +1,61 @@
-const db = require('../config/db');
-const path = require('path');
-require('dotenv').config();
+// src/scripts/seedOverviewStatistics.js
+import db from '../config/db.js';
+import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-// Get imported data from healthcareData.js
-const healthcareDataPath = path.resolve(__dirname, '../../../healthcare-dashboard/src/data/healthcareData.js');
+// Load environment variables
+dotenv.config();
+
+// ESM-compatible __dirname and __filename
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Path to healthcareData.js (try frontend first, fallback to local)
+const healthcareDataPath = path.resolve(
+  __dirname,
+  '../../../healthcare-dashboard/src/data/healthcareData.js'
+);
+
 let healthcareData;
 
 try {
-  const importedData = require(healthcareDataPath);
-  // Handle ES Module
-  if (importedData.__esModule && importedData.default) {
-    healthcareData = importedData.default;
+  if (fs.existsSync(healthcareDataPath)) {
+    const importedData = await import(healthcareDataPath);
+    healthcareData = importedData.default || importedData;
+    console.log('✅ Successfully loaded healthcare data from frontend');
   } else {
-    healthcareData = importedData;
+    const fallbackPath = path.resolve(__dirname, '../../data/healthcareData.js');
+    const importedData = await import(fallbackPath);
+    healthcareData = importedData.default || importedData;
+    console.log('✅ Loaded healthcare data from local folder');
   }
-  console.log('Successfully loaded healthcare data');
 } catch (error) {
-  console.error('Error loading healthcare data:', error.message);
+  console.error('❌ Error loading healthcare data:', error.message);
   process.exit(1);
 }
 
-async function seedOverviewStatistics() {
+// Helper: Categorize statistics
+function getCategoryForStat(statName) {
+  if (statName.includes('patient') || statName === 'patientSatisfactionScore') return 'patients';
+  if (statName.includes('appointment')) return 'appointments';
+  if (statName.includes('bed') || statName === 'bedOccupancyRate') return 'facilities';
+  if (statName.includes('staff') || statName.includes('doctor') || statName.includes('nurse')) return 'staff';
+  if (statName === 'revenue' || statName === 'expenses') return 'financial';
+  if (statName === 'averageWaitTime') return 'operations';
+  if (statName.includes('alert') || statName.includes('pending')) return 'alerts';
+  return 'general';
+}
+
+export async function seedOverviewStatistics() {
   const client = await db.pool.connect();
-  
+
   try {
-    console.log('Starting overview statistics seeding...');
-    
+    console.log('🚀 Starting overview statistics seeding...');
     await client.query('BEGIN');
 
-    // Check if table exists, if not create it
+    // ✅ Create table if not exists
     await client.query(`
       CREATE TABLE IF NOT EXISTS overview_statistics (
         id SERIAL PRIMARY KEY,
@@ -41,14 +68,11 @@ async function seedOverviewStatistics() {
       );
     `);
 
-    // Clear existing data if any
+    // ✅ Clear existing data
     await client.query('TRUNCATE overview_statistics RESTART IDENTITY CASCADE');
-    
-    // Insert overview statistics
-    if (healthcareData.overview) {
+
+    if (healthcareData?.overview) {
       const stats = [];
-      
-      // Map statistics with proper units and categories
       const unitMap = {
         averageWaitTime: 'minutes',
         patientSatisfactionScore: 'rating',
@@ -56,69 +80,57 @@ async function seedOverviewStatistics() {
         revenue: 'currency',
         expenses: 'currency'
       };
-      
+
       for (const [key, value] of Object.entries(healthcareData.overview)) {
         stats.push({
-          name: key, 
-          value: value, 
+          name: key,
+          value,
           category: getCategoryForStat(key),
           unit: unitMap[key] || 'count'
         });
       }
-      
-      let insertCount = 0;
+
+      // Insert or update each stat
       for (const stat of stats) {
-        await client.query(`
-          INSERT INTO overview_statistics (name, value, category, unit) 
+        await client.query(
+          `
+          INSERT INTO overview_statistics (name, value, category, unit)
           VALUES ($1, $2, $3, $4)
-          ON CONFLICT (name) DO UPDATE SET
-          value = $2, 
-          category = $3,
-          unit = $4,
-          last_updated = CURRENT_TIMESTAMP
-        `, [stat.name, stat.value, stat.category, stat.unit]);
-        insertCount++;
+          ON CONFLICT (name) DO UPDATE
+          SET value = EXCLUDED.value,
+              category = EXCLUDED.category,
+              unit = EXCLUDED.unit,
+              last_updated = CURRENT_TIMESTAMP
+          `,
+          [stat.name, stat.value, stat.category, stat.unit]
+        );
       }
-      
-      console.log(`Added ${insertCount} overview statistics`);
+
+      console.log(`✅ Inserted or updated ${stats.length} overview statistics`);
     } else {
-      console.log('No overview statistics found in healthcare data');
+      console.warn('⚠️ No overview statistics found in healthcare data');
     }
 
     await client.query('COMMIT');
-    console.log('Overview statistics seeded successfully!');
+    console.log('🎉 Overview statistics seeded successfully!');
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error seeding overview statistics:', error);
-    throw error; // Rethrow to catch in the calling function
+    console.error('❌ Error seeding overview statistics:', error);
+    throw error;
   } finally {
     client.release();
   }
 }
 
-// Helper function to categorize statistics
-function getCategoryForStat(statName) {
-  if (statName.includes('patient') || statName === 'patientSatisfactionScore') return 'patients';
-  if (statName.includes('appointment')) return 'appointments';
-  if (statName.includes('bed') || statName === 'bedOccupancyRate') return 'facilities';
-  if (statName.includes('staff') || statName.includes('doctor') || statName.includes('nurse')) return 'staff';
-  if (statName === 'revenue' || statName === 'expenses') return 'financial';
-  if (statName === 'averageWaitTime') return 'operations';
-  if (statName.includes('alert') || statName.includes('pending')) return 'alerts';
-  return 'general';
-}
-
-// Run directly if called from command line
-if (require.main === module) {
+// ✅ Run directly if executed from CLI
+if (import.meta.url === `file://${process.argv[1]}`) {
   seedOverviewStatistics()
     .then(() => {
-      console.log('Overview statistics seeding complete');
+      console.log('✅ Overview statistics seeding complete');
       process.exit(0);
     })
     .catch(err => {
-      console.error('Overview statistics seeding error:', err);
+      console.error('❌ Overview statistics seeding error:', err);
       process.exit(1);
     });
 }
-
-module.exports = seedOverviewStatistics;

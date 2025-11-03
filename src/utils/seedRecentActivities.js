@@ -1,4 +1,5 @@
-const db = require('../config/db');
+// src/seed/recentActivities.js
+import db from '../config/db.js';
 
 const recentActivities = [
   { id: 1, type: 'Patient Admission', message: 'Emma Davis admitted to Emergency Department', timestamp: '2024-06-12 14:30', priority: 'High' },
@@ -8,18 +9,18 @@ const recentActivities = [
   { id: 5, type: 'Appointment', message: 'Michael Brown scheduled for follow-up', timestamp: '2024-06-12 13:30', priority: 'Low' }
 ];
 
-async function seedRecentActivities() {
+export async function seedRecentActivities() {
   const client = await db.pool.connect();
-  
+
   try {
-    console.log('Starting recent activities seeding...');
-    
+    console.log('🚀 Starting recent activities seeding...');
+
     await client.query('BEGIN');
 
-    // Drop and recreate the table with the exact structure from healthcareData
+    // Drop and recreate the table
     await client.query(`
       DROP TABLE IF EXISTS recent_activities;
-      
+
       CREATE TABLE recent_activities (
         id SERIAL PRIMARY KEY,
         type VARCHAR(50) NOT NULL,
@@ -29,44 +30,39 @@ async function seedRecentActivities() {
       );
     `);
 
-    console.log('Recent activities table created');
-    
+    console.log('✅ Recent activities table created');
+
     // Insert activities
     for (const activity of recentActivities) {
-      await client.query(`
+      await client.query(
+        `
         INSERT INTO recent_activities (id, type, message, timestamp, priority)
         VALUES ($1, $2, $3, $4, $5)
-      `, [
-        activity.id,
-        activity.type,
-        activity.message,
-        activity.timestamp,
-        activity.priority
-      ]);
+        `,
+        [activity.id, activity.type, activity.message, activity.timestamp, activity.priority]
+      );
     }
 
     await client.query('COMMIT');
-    console.log(`Added ${recentActivities.length} recent activities`);
+    console.log(`🎯 Added ${recentActivities.length} recent activities`);
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('Error seeding recent activities:', error);
+    console.error('❌ Error seeding recent activities:', error);
     throw error;
   } finally {
     client.release();
   }
 }
 
-// Run directly if called from command line
-if (require.main === module) {
+// Run directly if executed via CLI
+if (import.meta.url === `file://${process.argv[1]}`) {
   seedRecentActivities()
     .then(() => {
-      console.log('Recent activities seeding complete');
+      console.log('✅ Recent activities seeding complete');
       process.exit(0);
     })
     .catch(err => {
-      console.error('Recent activities seeding error:', err);
+      console.error('⚠️ Seeding error:', err);
       process.exit(1);
     });
 }
-
-module.exports = seedRecentActivities;
