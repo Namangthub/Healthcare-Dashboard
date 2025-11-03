@@ -1,5 +1,5 @@
 // src/controllers/inventoryController.js
-import InventoryModel from '../models/inventoryModel.js';
+import  InventoryModel from '../models/inventoryModel.js';
 
 export const InventoryController = {
   // ✅ Get complete inventory data
