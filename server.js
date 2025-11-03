@@ -1,95 +1,64 @@
-import express from "express";
+// src/app.js
+const express = require('express');
+const cors = require('cors');
+const env = require('./config/env');
+const db = require('./config/db');
+const errorHandler = require('./middleware/errorHandler');
 
-import dotenv from "dotenv";
- 
-// ✅ Load environment variables
+// Import routes
+const departmentRoutes = require('./routes/departmentRoutes');
+const patientRoutes = require('./routes/patientRoutes');
+const staffRoutes = require('./routes/staffRoutes');
+const qualityRoutes = require('./routes/qualityRoutes');
+const financialRoutes = require('./routes/financialRoutes');
+const vitalSignsRoutes = require('./routes/vitalSignsRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const inventoryRoutes = require('./routes/inventoryRoutes');
+const overviewRoutes = require('./routes/overviewRoutes');
+const demographicsRoutes = require('./routes/demographicsRoutes');
+const activitiesRoutes = require('./routes/activitiesRoutes');
 
-dotenv.config();
- 
-// ✅ Import Middleware
-
-import errorHandler from "./src/middleware/errorHandler.js";
- 
-// ✅ Import Routes
-
-import patientRoutes from "./src/routes/patientRoutes.js";
-
-import doctorRoutes from "./src/routes/doctorRoutes.js";
-
-import departmentRoutes from "./src/routes/departmentRoutes.js";
-
-import staffRoutes from "./src/routes/staffRoutes.js";
-
-import appointmentRoutes from "./src/routes/appointmentRoutes.js";
-
-import medicalRecordRoutes from "./src/routes/medicalRecordRoutes.js";
-
-import billingRoutes from "./src/routes/billingRoutes.js";
-
-import emergencyCaseRoutes from "./src/routes/emergencyCaseRoutes.js";
-
-import labTestRoutes from "./src/routes/labTestRoutes.js";
- 
-// ✅ Initialize Express App
-
+// Initialize express app
 const app = express();
- 
-// ✅ Middleware
 
+// Middlewares
+app.use(cors());
 app.use(express.json());
- 
-// ✅ Base Routes
 
-app.use("/api/patients", patientRoutes);
-
-app.use("/api/doctors", doctorRoutes);
-
-app.use("/api/departments", departmentRoutes);
-
-app.use("/api/staff", staffRoutes);
-
-app.use("/api/appointments", appointmentRoutes);
-
-app.use("/api/medicalrecords", medicalRecordRoutes);
-
-app.use("/api/billings", billingRoutes);
-
-app.use("/api/emergencycases", emergencyCaseRoutes);
-
-app.use("/api/labtests", labTestRoutes);
- 
-// ✅ Health Check Route
-
-app.get("/", (req, res) => {
-
-  res.status(200).json({
-
-    success: true,
-
-    message: "System API is running smoothly 🚀",
-
-    version: "1.0.0",
-
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'success',
+    message: 'API is running',
+    timestamp: new Date()
   });
-
 });
- 
-// ✅ Global Error Handler (always last)
 
+// API routes
+app.use('/api/departments', departmentRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/quality', qualityRoutes);
+app.use('/api/financial', financialRoutes);
+app.use('/api/vitals', vitalSignsRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/overview', overviewRoutes);
+app.use('/api/demographics', demographicsRoutes);
+app.use('/api/activities', activitiesRoutes);
+
+
+
+// Error handling
 app.use(errorHandler);
- 
-// ✅ Start the Server
 
-const PORT = process.env.PORT || 3001;
- 
+// Start the server
+const PORT = env.PORT || 5000;
 app.listen(PORT, () => {
-
-  console.log(`✅ Server running successfully on http://localhost:${PORT}`);
-
+  console.log(`Server running on port ${PORT}`);
+  db.testConnection()
+    .then(() => console.log(`Database connected: ${new Date().toISOString()}`))
+    .catch(err => console.error('Database connection error:', err));
 });
- 
-// ✅ Export app for testing (optional)
 
-export default app;
-
- 
+module.exports = app;
