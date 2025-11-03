@@ -8,14 +8,15 @@ const AppointmentModel = {
       SELECT 
         a.id,
         a.patient_id AS patientId,
-        p.name AS patientName,
+        p.full_name AS patientName,
         a.date,
         a.time,
         a.status,
         a.type,
-        a.doctor_name AS doctorName
+        s.full_name AS doctorName
       FROM appointments a
       LEFT JOIN patients p ON a.patient_id = p.id
+      LEFT JOIN staff s ON a.staff_id = s.id
       ORDER BY a.date DESC, a.time DESC;
     `;
     const [rows] = await db.query(query);
@@ -28,14 +29,15 @@ const AppointmentModel = {
       SELECT 
         a.id,
         a.patient_id AS patientId,
-        p.name AS patientName,
+        p.full_name AS patientName,
         a.date,
         a.time,
         a.status,
         a.type,
-        a.doctor_name AS doctorName
+        s.full_name AS doctorName
       FROM appointments a
       LEFT JOIN patients p ON a.patient_id = p.id
+      LEFT JOIN staff s ON a.staff_id = s.id
       WHERE a.date = ?
       ORDER BY a.time ASC;
     `;
@@ -47,15 +49,16 @@ const AppointmentModel = {
   async getPatientAppointments(patientId) {
     const query = `
       SELECT 
-        id, 
-        date, 
-        time, 
-        status, 
-        type, 
-        doctor_name AS doctorName
-      FROM appointments
-      WHERE patient_id = ?
-      ORDER BY date DESC, time DESC;
+        a.id,
+        a.date,
+        a.time,
+        a.status,
+        a.type,
+        s.full_name AS doctorName
+      FROM appointments a
+      LEFT JOIN staff s ON a.staff_id = s.id
+      WHERE a.patient_id = ?
+      ORDER BY a.date DESC, a.time DESC;
     `;
     const [rows] = await db.query(query, [patientId]);
     return rows;
@@ -64,25 +67,25 @@ const AppointmentModel = {
   // Create a new appointment
   async createAppointment(data) {
     const query = `
-      INSERT INTO appointments (patient_id, date, time, type, status, doctor_name)
-      VALUES (?, ?, ?, ?, 'Scheduled', ?);
+      INSERT INTO appointments (patient_id, staff_id, date, time, type, status)
+      VALUES (?, ?, ?, ?, ?, 'Scheduled');
     `;
     const values = [
       data.patientId,
+      data.staffId || null,
       data.date,
       data.time,
-      data.type,
-      data.doctorName || 'Unassigned'
+      data.type
     ];
     const [result] = await db.query(query, values);
 
     return {
       id: result.insertId,
       patientId: data.patientId,
+      staffId: data.staffId || null,
       date: data.date,
       time: data.time,
       type: data.type,
-      doctorName: data.doctorName || 'Unassigned',
       status: 'Scheduled'
     };
   },
