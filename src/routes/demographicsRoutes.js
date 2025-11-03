@@ -1,5 +1,5 @@
 import express from 'express';
-import DemographicsController from '../controllers/demographicsController.js';
+import { DemographicsController } from '../controllers/demographicsController.js';
 
 const router = express.Router();
 
