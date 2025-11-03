@@ -1,5 +1,5 @@
 import express from 'express';
-import FinancialController from '../controllers/financialController.js';
+import { FinancialController } from '../controllers/financialController.js';
 
 const router = express.Router();
 

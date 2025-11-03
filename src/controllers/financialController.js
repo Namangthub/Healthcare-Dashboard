@@ -1,5 +1,5 @@
 // src/controllers/financialController.js
-import FinancialModel from '../models/financialModel.js';
+import { FinancialModel } from '../models/financialModel.js';
 
 export const FinancialController = {
   // ✅ Get all financial data
