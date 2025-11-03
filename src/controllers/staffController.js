@@ -1,10 +1,9 @@
-// src/controllers/staffController.js
 import StaffModel from '../models/staffModel.js';
 import { maskPII, maskEmail, maskPhoneNumber } from '../utils/privacyUtils.js';
 
-export const StaffController = {
-  // ✅ Get all staff members (with PII masked)
-  getAllStaff: async (req, res) => {
+const StaffController = {
+  // Get all staff
+  async getAllStaff(req, res) {
     try {
       const staff = await StaffModel.getAllStaff();
 
@@ -28,8 +27,8 @@ export const StaffController = {
     }
   },
 
-  // ✅ Get a single staff member by ID (with PII masked)
-  getStaffById: async (req, res) => {
+  // Get staff by ID
+  async getStaffById(req, res) {
     try {
       const { id } = req.params;
       const staff = await StaffModel.getStaffById(id);
@@ -37,8 +36,6 @@ export const StaffController = {
       if (!staff) {
         return res.status(404).json({ message: `Staff member with ID ${id} not found` });
       }
-
-      console.log('🧠 Raw staff data from DB:', staff);
 
       const secureStaff = {
         id: staff.id,
@@ -56,12 +53,12 @@ export const StaffController = {
       res.json(secureStaff);
     } catch (error) {
       console.error('❌ Error fetching staff member:', error);
-      res.status(500).json({ message: 'Failed to fetch staff member', error: error.message });
+      res.status(500).json({ error: error.message });
     }
   },
 
-  // ✅ Get staff by department ID (with PII masked)
-  getStaffByDepartmentId: async (req, res) => {
+  // Get staff by department
+  async getStaffByDepartmentId(req, res) {
     try {
       const { departmentId } = req.params;
       const staff = await StaffModel.getStaffByDepartmentId(departmentId);
@@ -86,8 +83,8 @@ export const StaffController = {
     }
   },
 
-  // ✅ Update staff status
-  updateStaffStatus: async (req, res) => {
+  // Update staff status
+  async updateStaffStatus(req, res) {
     try {
       const { id } = req.params;
       const { status } = req.body;
@@ -102,18 +99,15 @@ export const StaffController = {
         return res.status(404).json({ error: `Staff member with ID ${id} not found` });
       }
 
-      res.json({
-        success: true,
-        message: `Staff ${id} status updated to ${status}`
-      });
+      res.json({ success: true, message: `Staff ${id} status updated to ${status}` });
     } catch (error) {
       console.error('❌ Error updating staff status:', error);
       res.status(500).json({ error: error.message });
     }
   },
 
-  // ✅ Get patients assigned to a staff member
-  getPatientsByStaffId: async (req, res) => {
+  // Get patients by staff
+  async getPatientsByStaffId(req, res) {
     try {
       const { id } = req.params;
       const patients = await StaffModel.getPatientsByStaffId(id);
@@ -138,8 +132,8 @@ export const StaffController = {
     }
   },
 
-  // ✅ Get staff count by role
-  getStaffCountByRole: async (req, res) => {
+  // Get staff count by role
+  async getStaffCountByRole(req, res) {
     try {
       const counts = await StaffModel.getStaffCountByRole();
       res.json(counts);
@@ -149,8 +143,8 @@ export const StaffController = {
     }
   },
 
-  // ✅ Get staff count by department
-  getStaffCountByDepartment: async (req, res) => {
+  // Get staff count by department
+  async getStaffCountByDepartment(req, res) {
     try {
       const counts = await StaffModel.getStaffCountByDepartment();
       res.json(counts);
@@ -160,3 +154,5 @@ export const StaffController = {
     }
   }
 };
+
+export default StaffController;

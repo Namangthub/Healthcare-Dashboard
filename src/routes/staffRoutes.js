@@ -3,7 +3,7 @@ import StaffController from '../controllers/staffController.js';
 
 const router = express.Router();
 
-// Get all staff (with PII masked)
+// Get all staff
 router.get('/', StaffController.getAllStaff);
 
 // Get staff count by role
@@ -12,14 +12,14 @@ router.get('/count-by-role', StaffController.getStaffCountByRole);
 // Get staff count by department
 router.get('/count-by-department', StaffController.getStaffCountByDepartment);
 
-// Get staff member by ID
+// Get staff by department
+router.get('/department/:departmentId', StaffController.getStaffByDepartmentId);
+
+// Get a staff member by ID
 router.get('/:id', StaffController.getStaffById);
 
-// Get patients assigned to staff member
+// Get patients assigned to a staff member
 router.get('/:id/patients', StaffController.getPatientsByStaffId);
-
-// Get staff by department ID
-router.get('/department/:departmentId', StaffController.getStaffByDepartmentId);
 
 // Update staff status
 router.put('/:id/status', StaffController.updateStaffStatus);

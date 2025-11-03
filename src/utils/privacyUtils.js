@@ -2,18 +2,12 @@
  * Utility functions for masking PII data
  */
 
-// Mask a name
-export const maskPII = (fullName) => {
-  if (!fullName) return 'Unknown';
-  
-  const parts = fullName.split(' ');
-  
-  return parts.map(part => {
-    if (part.length <= 1) return part;
-    return `${part.charAt(0)}${'*'.repeat(part.length - 1)}`;
-  }).join(' ');
-};
-
+// ✅ Mask personally identifiable information (PII)
+export function maskPII(name = '') {
+  if (!name) return '';
+  const parts = name.split(' ');
+  return parts.map(p => p[0] + '*'.repeat(Math.max(p.length - 1, 0))).join(' ');
+}
 // Mask a patient ID
 export const maskPatientId = (id) => {
   if (!id) return '';
@@ -24,46 +18,21 @@ export const maskPatientId = (id) => {
   return prefix + masked;
 };
 
-// Mask an email address
-export const maskEmail = (email) => {
-  if (!email) return '';
-  
-  const parts = email.split('@');
-  if (parts.length !== 2) return email;
-  
-  const name = parts[0];
-  const domain = parts[1];
-  
-  let maskedName;
-  if (name.length <= 2) {
-    maskedName = name;
-  } else {
-    maskedName = name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
-  }
-  
-  return maskedName + '@' + domain;
-};
-
-// Mask a phone number
-export const maskPhone = (phone) => {
+// ✅ Mask email addresses
+export function maskEmail(email = '') {
+  if (!email || !email.includes('@')) return email;
+  const [user, domain] = email.split('@');
+  const maskedUser = user[0] + '*'.repeat(Math.max(user.length - 2, 0)) + user.slice(-1);
+  return `${maskedUser}@${domain}`;
+}
+// ✅ Mask phone numbers
+export function maskPhoneNumber(phone = '') {
   if (!phone) return '';
-  
-  const digits = phone.replace(/\D/g, '');
-  
-  if (digits.length <= 4) return phone;
-  
-  const visiblePart = digits.slice(-4);
-  const maskedPart = '*'.repeat(digits.length - 4);
-  
-  if (phone.includes('-') || phone.includes('(')) {
-    if (phone.includes('(') && phone.includes(')')) {
-      return `(***) ***-${visiblePart}`;
-    }
-    return `***-***-${visiblePart}`;
-  }
-  
-  return maskedPart + visiblePart;
-};
+  const cleaned = phone.replace(/\D/g, ''); // remove non-digits
+  if (cleaned.length < 4) return '*'.repeat(cleaned.length);
+  const visible = cleaned.slice(-4);
+  return `***-***-${visible}`;
+}
 
 export default {
   maskPII,
