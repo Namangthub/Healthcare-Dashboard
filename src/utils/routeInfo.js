@@ -1,8 +1,8 @@
-const express = require('express');
-const app = require('../app');
+import express from 'express';
+import app from '../app.js';
 
 // Function to extract routes from an Express app
-function getRoutes(app) {
+export function getRoutes(app) {
   const routes = [];
   
   function extractRoutes(layer, path = '') {
@@ -23,9 +23,15 @@ function getRoutes(app) {
     } else if (layer.name === 'router' && layer.handle.stack) {
       // It's a router middleware
       const routerPath = path + (layer.regexp.toString().match(/^\/\^\\\/([^\\]*)/)?.[1] || '');
-      layer.handle.stack.forEach(layer => extractRoutes(layer, routerPath));
-    } else if (layer.name !== 'expressInit' && layer.name !== 'query' && layer.name !== 'corsMiddleware' && 
-               layer.name !== 'jsonParser' && layer.name !== 'errorHandler' && layer.handle) {
+      layer.handle.stack.forEach(innerLayer => extractRoutes(innerLayer, routerPath));
+    } else if (
+      layer.name !== 'expressInit' &&
+      layer.name !== 'query' &&
+      layer.name !== 'corsMiddleware' &&
+      layer.name !== 'jsonParser' &&
+      layer.name !== 'errorHandler' &&
+      layer.handle
+    ) {
       if (layer.regexp && layer.regexp.fast_slash !== true) {
         const subPath = layer.regexp.toString().match(/^\/\^\\\/([^\\]*)/)?.[1] || '';
         const routerPath = path + (subPath ? `/${subPath}` : '');
@@ -47,7 +53,7 @@ function getRoutes(app) {
 }
 
 // Get and display routes
-function displayRoutes() {
+export function displayRoutes() {
   try {
     const routes = getRoutes(app);
     
@@ -67,9 +73,11 @@ function displayRoutes() {
     Object.keys(groupedRoutes).sort().forEach(basePath => {
       console.log(`\n${basePath.toUpperCase()}:`);
       
-      groupedRoutes[basePath].sort((a, b) => a.path.localeCompare(b.path)).forEach(route => {
-        console.log(`  ${route.methods.join(', ')} ${route.path}`);
-      });
+      groupedRoutes[basePath]
+        .sort((a, b) => a.path.localeCompare(b.path))
+        .forEach(route => {
+          console.log(`  ${route.methods.join(', ')} ${route.path}`);
+        });
     });
     
     console.log('\nTotal API routes:', routes.length);
@@ -78,12 +86,12 @@ function displayRoutes() {
   }
 }
 
-// Run directly if called from command line
-if (require.main === module) {
+// ✅ Run directly if called from command line
+if (import.meta.url === `file://${process.argv[1]}`) {
   displayRoutes();
 }
 
-module.exports = {
+export default {
   displayRoutes,
   getRoutes
 };

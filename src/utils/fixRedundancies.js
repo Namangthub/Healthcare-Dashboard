@@ -1,8 +1,8 @@
-const db = require('../config/db');
-const seedRecentActivities = require('./seedRecentActivities');
-const seedVitalSigns = require('./seedVitalSigns');
+import db from '../config/db.js';
+import seedRecentActivities from './seedRecentActivities.js';
+import seedVitalSigns from './seedVitalSigns.js';
 
-async function fixRedundancies() {
+export async function fixRedundancies() {
   console.log('=== Starting redundancy fixes ===');
   
   try {
@@ -36,8 +36,8 @@ async function fixRedundancies() {
   }
 }
 
-// Run directly if called from command line
-if (require.main === module) {
+// ✅ Run directly if called from command line
+if (import.meta.url === `file://${process.argv[1]}`) {
   fixRedundancies()
     .then(() => {
       console.log('Fix redundancies script completed');
@@ -49,4 +49,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = fixRedundancies;
+export default fixRedundancies;

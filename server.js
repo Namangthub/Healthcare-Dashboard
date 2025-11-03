@@ -1,10 +1,9 @@
-// src/server.js
+// server.js
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import db from './src/config/db.js';
 import { errorHandler } from './src/middleware/errorHandler.js';
-
 
 // Import route files
 import departmentRoutes from './src/routes/departmentRoutes.js';
@@ -18,7 +17,6 @@ import inventoryRoutes from './src/routes/inventoryRoutes.js';
 import overviewRoutes from './src/routes/overviewRoutes.js';
 import demographicsRoutes from './src/routes/demographicsRoutes.js';
 import activitiesRoutes from './src/routes/activitiesRoutes.js';
-
 
 // Initialize environment variables
 dotenv.config();
@@ -56,7 +54,7 @@ app.use('/api/activities', activitiesRoutes);
 app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);

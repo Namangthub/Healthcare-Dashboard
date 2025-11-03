@@ -1,1 +1,1 @@
-SELECT* from staff_schedule;
+SELECT* from appointments;

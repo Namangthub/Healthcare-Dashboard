@@ -1,13 +1,11 @@
-// src/utils/privacyUtils.js
 /**
  * Utility functions for masking PII data
  */
 
 // Mask a name
-const maskPII = (fullName) => {
+export const maskPII = (fullName) => {
   if (!fullName) return 'Unknown';
   
-  // Split by spaces to handle first and last names
   const parts = fullName.split(' ');
   
   return parts.map(part => {
@@ -17,10 +15,9 @@ const maskPII = (fullName) => {
 };
 
 // Mask a patient ID
-const maskPatientId = (id) => {
+export const maskPatientId = (id) => {
   if (!id) return '';
   
-  // Keep first 2 characters, mask the rest
   const prefix = id.substring(0, 2);
   const masked = '*'.repeat(id.length - 2);
   
@@ -28,7 +25,7 @@ const maskPatientId = (id) => {
 };
 
 // Mask an email address
-const maskEmail = (email) => {
+export const maskEmail = (email) => {
   if (!email) return '';
   
   const parts = email.split('@');
@@ -37,7 +34,6 @@ const maskEmail = (email) => {
   const name = parts[0];
   const domain = parts[1];
   
-  // Keep first and last character of name part
   let maskedName;
   if (name.length <= 2) {
     maskedName = name;
@@ -49,19 +45,16 @@ const maskEmail = (email) => {
 };
 
 // Mask a phone number
-const maskPhone = (phone) => {
+export const maskPhone = (phone) => {
   if (!phone) return '';
   
-  // Remove any non-digit characters
   const digits = phone.replace(/\D/g, '');
   
-  // Keep last 4 digits, mask the rest
   if (digits.length <= 4) return phone;
   
   const visiblePart = digits.slice(-4);
   const maskedPart = '*'.repeat(digits.length - 4);
   
-  // Try to preserve original format
   if (phone.includes('-') || phone.includes('(')) {
     if (phone.includes('(') && phone.includes(')')) {
       return `(***) ***-${visiblePart}`;
@@ -72,7 +65,7 @@ const maskPhone = (phone) => {
   return maskedPart + visiblePart;
 };
 
-module.exports = {
+export default {
   maskPII,
   maskPatientId,
   maskEmail,
