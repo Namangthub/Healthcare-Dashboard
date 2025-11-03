@@ -1,620 +1,567 @@
---DML SCRIPT FOR DATABSE--
 
- INSERT INTO department_staff (department_id, doctors, nurses, support)
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- --------------------------
+-- 1) Departments (8 entries)
+-- --------------------------
+INSERT INTO departments (id, name, code, total_patients, today_patients, avg_wait_time, satisfaction, revenue, capacity, current_occupancy, critical_cases)
 VALUES
-(1, 18, 36, 12),
-(2, 14, 30, 10),
-(3, 16, 34, 11),
-(4, 12, 28, 8),
-(5, 22, 45, 18),
-(6, 10, 20, 7),
-(7, 6, 12, 4),
-(8, 5, 10, 3),
-(9, 9, 18, 6),
-(10, 20, 40, 15);
+(1, 'Cardiology', 'CARD', 320, 12, 25, 4.5, 1250000.00, 60, 45, 4),
+(2, 'Orthopedics', 'ORTH', 250, 8, 18, 4.3, 980000.00, 50, 34, 2),
+(3, 'Neurology', 'NEUR', 180, 6, 30, 4.1, 760000.00, 40, 28, 3),
+(4, 'Pediatrics', 'PED', 400, 15, 20, 4.6, 540000.00, 70, 55, 1),
+(5, 'General Medicine', 'GEN', 800, 30, 22, 4.2, 2100000.00, 120, 95, 10),
+(6, 'Emergency', 'EMER', 1200, 40, 10, 4.0, 3200000.00, 150, 120, 25),
+(7, 'Oncology', 'ONC', 130, 3, 45, 4.0, 980000.00, 30, 22, 6),
+(8, 'ENT', 'ENT', 140, 5, 15, 4.4, 420000.00, 35, 26, 1);
 
-
-INSERT INTO staff
-(id, first_name, last_name, full_name, role, department_id, status, shift, experience, patient_count, phone, email, specialty, rating)
+-- -------------------------------
+-- 2) Department staff counts
+-- -------------------------------
+INSERT INTO department_staff (department_id, doctors, nurses, support)
 VALUES
-('STF001','Ritesh','Verma','Dr. Ritesh Verma','Doctor',1,'On Duty','Morning',15,120,'9811111101','ritesh.verma@hospital.in','Cardiologist',9.2),
-('STF002','Sneha','Rao','Dr. Sneha Rao','Doctor',2,'On Duty','Evening',12,95,'9822222202','sneha.rao@hospital.in','Neurologist',9.0),
-('STF003','Anil','Khanna','Dr. Anil Khanna','Doctor',3,'Off Duty','Morning',18,140,'9833333303','anil.khanna@hospital.in','Orthopedic Surgeon',9.3),
-('STF004','Pooja','Sharma','Dr. Pooja Sharma','Doctor',4,'On Call','Night',10,80,'9844444404','pooja.sharma@hospital.in','Pediatrician',9.1),
-('STF005','Rohit','Singh','Dr. Rohit Singh','Doctor',5,'On Duty','Night',9,220,'9855555505','rohit.singh@hospital.in','Emergency Physician',8.6),
-('STF006','Meera','Kapoor','Dr. Meera Kapoor','Doctor',6,'On Duty','Morning',11,70,'9866666606','meera.kapoor@hospital.in','Gastroenterologist',8.8),
-('STF007','Vikram','Deshmukh','Dr. Vikram Deshmukh','Doctor',7,'Off Duty','Evening',8,50,'9877777707','vikram.deshmukh@hospital.in','Dermatologist',8.9),
-('STF008','Nisha','Agarwal','Dr. Nisha Agarwal','Doctor',8,'On Duty','Morning',7,45,'9888888808','nisha.agarwal@hospital.in','Ophthalmologist',8.7),
-('STF009','Siddharth','Malhotra','Dr. Siddharth Malhotra','Doctor',9,'On Duty','Evening',14,90,'9899999909','siddharth.m@hospital.in','Oncologist',8.4),
-('STF010','Kavya','Iyer','Dr. Kavya Iyer','Doctor',10,'On Call','Night',6,60,'9810000010','kavya.iyer@hospital.in','General Physician',9.0),
- 
-('STF011','Ananya','Verma','Ananya Verma','Nurse',1,'On Duty','Morning',6,40,'9810000111','ananya.verma@hospital.in','Critical Care Nursing',8.5),
-('STF012','Sahil','Kumar','Sahil Kumar','Nurse',1,'On Duty','Evening',4,30,'9820000112','sahil.kumar@hospital.in','Cardiac ICU Nursing',8.3),
-('STF013','Preeti','Shukla','Preeti Shukla','Nurse',2,'Off Duty','Morning',7,35,'9830000113','preeti.shukla@hospital.in','Neuro ICU Nursing',8.6),
-('STF014','Rohini','Patel','Rohini Patel','Nurse',3,'On Duty','Night',5,28,'9840000114','rohini.patel@hospital.in','Orthopedic Nursing',8.2),
-('STF015','Gaurav','Mehra','Gaurav Mehra','Nurse',4,'On Duty','Morning',9,50,'9850000115','gaurav.mehra@hospital.in','Pediatrics Nursing',8.7),
-('STF016','Simran','Kaur','Simran Kaur','Nurse',5,'On Duty','Night',8,60,'9860000116','simran.kaur@hospital.in','Emergency Nursing',8.1),
-('STF017','Deepak','Yadav','Deepak Yadav','Nurse',6,'On Duty','Evening',10,55,'9870000117','deepak.yadav@hospital.in','Gastro Nursing',8.4),
-('STF018','Ritika','Das','Ritika Das','Nurse',7,'Off Duty','Morning',3,20,'9880000118','ritika.das@hospital.in','Dermatology Nursing',8.0),
-('STF019','Kabir','Khanna','Kabir Khanna','Nurse',8,'On Duty','Morning',6,22,'9890000119','kabir.khanna@hospital.in','Ophthalmic Nursing',8.2),
-('STF020','Mitali','Ghosh','Mitali Ghosh','Nurse',9,'On Duty','Evening',5,30,'9810000120','mitali.ghosh@hospital.in','Oncology Nursing',8.3),
- 
-('STF021','Arjun','Singh','Arjun Singh','Nurse',10,'On Duty','Morning',7,48,'9820000121','arjun.singh@hospital.in','General Nursing',8.6),
-('STF022','Neha','Saxena','Neha Saxena','Support',1,'On Duty','Morning',4,12,'9830000122','neha.saxena@hospital.in','Phlebotomist',7.9),
-('STF023','Manish','Joshi','Manish Joshi','Support',2,'On Duty','Evening',6,15,'9840000123','manish.joshi@hospital.in','Radiology Tech',8.0),
-('STF024','Priya','Jain','Priya Jain','Support',3,'Off Duty','Morning',5,10,'9850000124','priya.jain@hospital.in','Physiotherapist',8.1),
-('STF025','Sonia','Bhardwaj','Sonia Bhardwaj','Support',4,'On Duty','Night',8,18,'9860000125','sonia.bhardwaj@hospital.in','Dietician',8.4),
-('STF026','Vivek','Sinha','Vivek Sinha','Support',5,'On Duty','Morning',9,25,'9870000126','vivek.sinha@hospital.in','Paramedic',8.2),
-('STF027','Tanvi','Reddy','Tanvi Reddy','Support',5,'On Duty','Evening',3,8,'9880000127','tanvi.reddy@hospital.in','ER Technician',7.8),
-('STF028','Kunal','Bose','Kunal Bose','Support',6,'On Duty','Morning',7,12,'9890000128','kunal.bose@hospital.in','Lab Technician',8.1),
-('STF029','Pallavi','Khatri','Pallavi Khatri','Support',7,'Off Duty','Morning',4,9,'9810000129','pallavi.khatri@hospital.in','Receptionist',7.7),
-('STF030','Ankit','Malik','Ankit Malik','Support',8,'On Duty','Evening',6,11,'9820000130','ankit.malik@hospital.in','Optometry Assistant',8.0),
- 
-('STF031','Charu','Pandey','Charu Pandey','Doctor',1,'On Duty','Evening',13,85,'9830000131','charu.pandey@hospital.in','Interventional Cardiologist',9.1),
-('STF032','Rahul','Nanda','Rahul Nanda','Doctor',2,'On Duty','Morning',11,77,'9840000132','rahul.nanda@hospital.in','Neuro Surgeon',9.0),
-('STF033','Nisha','Joshi','Nisha Joshi','Doctor',3,'On Call','Night',9,66,'9850000133','nisha.joshi@hospital.in','Joint Replacement Surgeon',8.8),
-('STF034','Varun','Kapoor','Varun Kapoor','Doctor',4,'Off Duty','Morning',7,40,'9860000134','varun.kapoor@hospital.in','Pediatric Surgeon',8.6),
-('STF035','Ira','Mishra','Ira Mishra','Doctor',5,'On Duty','Morning',10,130,'9870000135','ira.mishra@hospital.in','Trauma Surgeon',8.4),
-('STF036','Karan','Bhatia','Karan Bhatia','Nurse',9,'On Duty','Night',12,58,'9880000136','karan.bhatia@hospital.in','Oncology Nursing',8.5),
-('STF037','Rhea','Nair','Rhea Nair','Nurse',10,'On Duty','Morning',5,34,'9890000137','rhea.nair@hospital.in','General Nursing',8.2),
-('STF038','Amit','Tiwari','Amit Tiwari','Nurse',6,'Off Duty','Evening',6,29,'9810000138','amit.tiwari@hospital.in','Gastro Nursing',8.0),
-('STF039','Diya','Chatterjee','Diya Chatterjee','Nurse',4,'On Duty','Morning',4,22,'9820000139','diya.chatterjee@hospital.in','Pediatrics Nursing',8.1),
-('STF040','Sanya','Batra','Sanya Batra','Support',10,'On Duty','Evening',5,14,'9830000140','sanya.batra@hospital.in','Medical Records',7.9);
- 
+(1, 8, 16, 6),
+(2, 6, 12, 5),
+(3, 5, 10, 4),
+(4, 10, 18, 7),
+(5, 12, 24, 10),
+(6, 15, 30, 12),
+(7, 4, 8, 3),
+(8, 5, 10, 3);
 
-
-INSERT INTO staff 
-(id, first_name, last_name, full_name, role, department_id, status, shift, experience, patient_count, phone, email, specialty, rating)
+-- --------------------------
+-- 3) Staff (doctors/nurses)
+-- --------------------------
+-- staff ids S001..S030 (doctors + some nurses/admin)
+INSERT INTO staff (id, first_name, last_name, full_name, role, department_id, status, shift, experience, patient_count, phone, email, specialty, rating)
 VALUES
-('D101', 'Ritesh', 'Verma', 'Dr. Ritesh Verma', 'Doctor', 1, 'On Duty', 'Morning', 15, 12, '9811111111', 'ritesh.verma@hospital.in', 'Cardiologist', 4.8),
-('D102', 'Sneha', 'Rao', 'Dr. Sneha Rao', 'Doctor', 2, 'On Duty', 'Evening', 12, 10, '9822222222', 'sneha.rao@hospital.in', 'Neurologist', 4.7),
-('D103', 'Anil', 'Khanna', 'Dr. Anil Khanna', 'Doctor', 3, 'On Call', 'Morning', 18, 9, '9833333333', 'anil.khanna@hospital.in', 'Orthopedic Surgeon', 4.6),
-('D104', 'Meera', 'Joshi', 'Dr. Meera Joshi', 'Doctor', 4, 'On Duty', 'Night', 10, 8, '9844444444', 'meera.joshi@hospital.in', 'Gastroenterologist', 4.9),
-('D105', 'Arvind', 'Patel', 'Dr. Arvind Patel', 'Doctor', 5, 'On Duty', 'Morning', 20, 14, '9855555555', 'arvind.patel@hospital.in', 'General Physician', 4.5),
-('D106', 'Priya', 'Nair', 'Dr. Priya Nair', 'Doctor', 6, 'On Leave', 'Evening', 8, 5, '9866666666', 'priya.nair@hospital.in', 'Pediatrician', 4.4),
-('D107', 'Sameer', 'Bose', 'Dr. Sameer Bose', 'Doctor', 7, 'On Call', 'Night', 9, 6, '9877777777', 'sameer.bose@hospital.in', 'Dermatologist', 4.6),
-('D108', 'Anita', 'Reddy', 'Dr. Anita Reddy', 'Doctor', 8, 'On Duty', 'Morning', 14, 10, '9888888888', 'anita.reddy@hospital.in', 'Ophthalmologist', 4.8),
-('D109', 'Tarun', 'Kapoor', 'Dr. Tarun Kapoor', 'Doctor', 9, 'On Duty', 'Morning', 16, 11, '9899999999', 'tarun.kapoor@hospital.in', 'Oncologist', 4.9),
-('D110', 'Suman', 'Mishra', 'Dr. Suman Mishra', 'Doctor', 10, 'On Duty', 'Morning', 11, 7, '9900000000', 'suman.mishra@hospital.in', 'Psychiatrist', 4.7);
- 
+('S001','Rohit','Sharma','Rohit Sharma','Cardiologist',1,'On Duty','Morning',15,120,'9810010101','rohit.sharma@hospital.in','Interventional Cardiology',4.7),
+('S002','Priya','Singh','Priya Singh','Cardiologist',1,'On Duty','Evening',10,80,'9810010102','priya.singh@hospital.in','Non-invasive Cardiology',4.5),
+('S003','Anil','Verma','Anil Verma','Orthopedic Surgeon',2,'On Duty','Morning',12,95,'9810010103','anil.verma@hospital.in','Joint Replacement',4.6),
+('S004','Meera','Patel','Meera Patel','Orthopedic Surgeon',2,'On Call','Night',9,70,'9810010104','meera.patel@hospital.in','Spine Surgery',4.4),
+('S005','Sanjay','Kumar','Sanjay Kumar','Neurologist',3,'On Duty','Morning',14,65,'9810010105','sanjay.kumar@hospital.in','Stroke',4.3),
+('S006','Ananya','Gupta','Ananya Gupta','Pediatrician',4,'On Duty','Morning',8,150,'9810010106','ananya.gupta@hospital.in','Neonatology',4.8),
+('S007','Vikram','Rao','Vikram Rao','General Physician',5,'On Duty','Evening',11,210,'9810010107','vikram.rao@hospital.in','Internal Medicine',4.2),
+('S008','Nisha','Jain','Nisha Jain','Emergency Physician',6,'On Duty','Night',7,320,'9810010108','nisha.jain@hospital.in','Trauma',4.1),
+('S009','Karan','Mehta','Karan Mehta','Oncologist',7,'On Duty','Morning',13,40,'9810010109','karan.mehta@hospital.in','Medical Oncology',4.0),
+('S010','Rhea','Kapoor','Rhea Kapoor','ENT Surgeon',8,'On Duty','Morning',9,50,'9810010110','rhea.kapoor@hospital.in','Otology',4.4),
+('S011','Pooja','Shah','Pooja Shah','Nurse',1,'On Duty','Morning',6,0,'9810010111','pooja.shah@hospital.in','Nursing',4.1),
+('S012','Amit','Bhatt','Amit Bhatt','Nurse',2,'On Duty','Evening',5,0,'9810010112','amit.bhatt@hospital.in','Nursing',4.0),
+('S013','Deepa','Reddy','Deepa Reddy','Nurse',3,'Off Duty','Night',7,0,'9810010113','deepa.reddy@hospital.in','Nursing',4.2),
+('S014','Rakesh','Nair','Rakesh Nair','Nurse',4,'On Duty','Morning',4,0,'9810010114','rakesh.nair@hospital.in','Nursing',4.3),
+('S015','Sunita','Verma','Sunita Verma','Nurse',5,'On Duty','Evening',10,0,'9810010115','sunita.verma@hospital.in','Nursing',4.4),
+('S016','Harish','Kohli','Harish Kohli','Support Staff',6,'On Duty','Night',12,0,'9810010116','harish.kohli@hospital.in','Support',3.9),
+('S017','Preeti','Joshi','Preeti Joshi','Support Staff',6,'On Duty','Morning',6,0,'9810010117','preeti.joshi@hospital.in','Support',4.0),
+('S018','Manish','Agarwal','Manish Agarwal','Pharmacist',5,'On Duty','Morning',9,0,'9810010118','manish.agarwal@hospital.in','Pharmacy',4.2),
+('S019','Gita','Iyer','Gita Iyer','Radiologist',3,'On Call','Evening',11,0,'9810010119','gita.iyer@hospital.in','Diagnostic Radiology',4.3),
+('S020','Vivek','Malhotra','Vivek Malhotra','Physiotherapist',2,'On Duty','Morning',8,0,'9810010120','vivek.malhotra@hospital.in','Physiotherapy',4.1),
+('S021','Sakshi','Desai','Sakshi Desai','Dietician',4,'On Duty','Morning',6,0,'9810010121','sakshi.desai@hospital.in','Nutrition',4.5),
+('S022','Arjun','Bose','Arjun Bose','Surgeon',5,'On Duty','Morning',16,110,'9810010122','arjun.bose@hospital.in','General Surgery',4.6),
+('S023','Ritu','Khan','Ritu Khan','Psychiatrist',5,'On Duty','Evening',10,65,'9810010123','ritu.khan@hospital.in','Behavioral Medicine',4.0),
+('S024','Sumit','Roy','Sumit Roy','Anesthesiologist',1,'On Call','Night',14,0,'9810010124','sumit.roy@hospital.in','Anesthesia',4.5),
+('S025','Isha','Nambiar','Isha Nambiar','Nurse',6,'On Duty','Morning',5,0,'9810010125','isha.nambiar@hospital.in','Nursing',4.1),
+('S026','Aakash','Chopra','Aakash Chopra','Cardiology Fellow',1,'On Call','Evening',3,20,'9810010126','aakash.chopra@hospital.in','Cardiology',4.0),
+('S027','Devika','Menon','Devika Menon','Oncology Nurse',7,'On Duty','Morning',7,0,'9810010127','devika.menon@hospital.in','Oncology Nursing',4.2),
+('S028','Naveen','Saxena','Naveen Saxena','ENT Nurse',8,'On Duty','Evening',6,0,'9810010128','naveen.saxena@hospital.in','Nursing',4.1),
+('S029','Raman','Kumar','Raman Kumar','Junior Doctor',5,'On Duty','Morning',2,30,'9810010129','raman.kumar@hospital.in','Medicine',3.9),
+('S030','Leena','Bhardwaj','Leena Bhardwaj','Nurse',5,'Off Duty','Night',4,0,'9810010130','leena.bhardwaj@hospital.in','Nursing',4.0);
 
-INSERT INTO patients 
-(id, first_name, last_name, full_name, age, gender, date_of_birth, phone, email, address, insurance, emergency_contact, department_id, doctor_id, admission_date, status, severity, room, diagnosis, last_visit, next_appointment, notes)
+-- --------------------------
+-- 4) Medications (10 meds)
+-- --------------------------
+INSERT INTO medications (id, name)
 VALUES
-('P001', 'Rahul', 'Mehta', 'Rahul Mehta', 45, 'Male', '1980-06-15', '9811122233', 'rahul.mehta@gmail.com', 'C-22, Lajpat Nagar, Delhi', 'Star Health', 'Rohit Mehta - 9811122244', 1, 'D101', '2025-09-05', 'Discharged', 'High', '101A', 'Coronary artery disease', '2025-09-20', '2025-10-05', 'Stable after angioplasty'),
-('P002', 'Sneha', 'Sharma', 'Sneha Sharma', 38, 'Female', '1987-03-22', '9823344455', 'sneha.sharma@gmail.com', 'Malad West, Mumbai', 'HDFC Ergo', 'Amit Sharma - 9823344466', 2, 'D102', '2025-09-08', 'In Treatment', 'Medium', '202B', 'Migraine and chronic headache', '2025-09-25', '2025-11-10', 'Responding to medication'),
-('P003', 'Aman', 'Raturi', 'Aman Raturi', 27, 'Male', '1998-07-09', '9832233344', 'aman.raturi@gmail.com', 'Rajpur Road, Dehradun', 'ICICI Lombard', 'Neha Raturi - 9832233355', 3, 'D103', '2025-09-10', 'Discharged', 'Medium', '303C', 'Fractured radius bone', '2025-09-15', '2025-11-05', 'Under physiotherapy'),
-('P004', 'Pooja', 'Singh', 'Pooja Singh', 32, 'Female', '1993-11-12', '9845566677', 'pooja.singh@gmail.com', 'Hazratganj, Lucknow', 'Bajaj Allianz', 'Ankit Singh - 9845566688', 4, 'D104', '2025-09-11', 'Discharged', 'Low', '404B', 'Gastritis and acid reflux', '2025-09-18', '2025-11-01', 'No major issues'),
-('P005', 'Rakesh', 'Verma', 'Rakesh Verma', 60, 'Male', '1965-02-20', '9856677788', 'rakesh.verma@gmail.com', 'Vaishali Nagar, Jaipur', 'New India Assurance', 'Nisha Verma - 9856677799', 1, 'D101', '2025-09-15', 'Critical', 'High', '105A', 'Severe heart blockage', '2025-09-29', '2025-11-10', 'Under observation in ICU'),
-('P006', 'Deepak', 'Joshi', 'Deepak Joshi', 41, 'Male', '1984-08-25', '9867788899', 'deepak.joshi@gmail.com', 'Kothrud, Pune', 'Reliance Health', 'Anjali Joshi - 9867788800', 5, 'D105', '2025-09-18', 'Discharged', 'Low', '106B', 'Viral fever', '2025-09-23', '2025-11-12', 'Recovered fully'),
-('P007', 'Neha', 'Agarwal', 'Neha Agarwal', 29, 'Female', '1996-05-19', '9878899900', 'neha.agarwal@gmail.com', 'South Ex, Delhi', 'Max Bupa', 'Ravi Agarwal - 9878899911', 6, 'D106', '2025-09-20', 'In Treatment', 'Medium', '207C', 'Dengue fever', '2025-09-28', '2025-11-06', 'Platelets improving'),
-('P008', 'Arjun', 'Kapoor', 'Arjun Kapoor', 35, 'Male', '1990-04-14', '9889900112', 'arjun.kapoor@gmail.com', 'Bandra, Mumbai', 'HDFC Ergo', 'Karan Kapoor - 9889900223', 7, 'D107', '2025-09-21', 'Discharged', 'Low', '208A', 'Skin allergy', '2025-09-25', '2025-10-20', 'Allergic reaction under control'),
-('P009', 'Kiran', 'Deshmukh', 'Kiran Deshmukh', 54, 'Female', '1971-12-03', '9890011223', 'kiran.deshmukh@gmail.com', 'Aundh, Pune', 'Star Health', 'Prashant Deshmukh - 9890011234', 8, 'D108', '2025-09-22', 'In Treatment', 'Medium', '209B', 'Cataract surgery recovery', '2025-09-29', '2025-11-09', 'Follow-up required'),
-('P010', 'Mohit', 'Sinha', 'Mohit Sinha', 40, 'Male', '1985-01-09', '9901122334', 'mohit.sinha@gmail.com', 'Salt Lake, Kolkata', 'ICICI Lombard', 'Rina Sinha - 9901122445', 9, 'D109', '2025-09-25', 'In Treatment', 'High', '210A', 'Lung cancer (Stage II)', '2025-09-30', '2025-11-15', 'Chemotherapy ongoing'),
-('P011', 'Anjali', 'Rao', 'Anjali Rao', 33, 'Female', '1992-09-13', '9811122211', 'anjali.rao@gmail.com', 'Mysore Road, Bangalore', 'Care Health', 'Vivek Rao - 9811133344', 10, 'D110', '2025-09-26', 'Scheduled', 'Low', '211A', 'Pregnancy (7 months)', '2025-09-15', '2025-11-05', 'Scheduled delivery checkup'),
-('P012', 'Nikhil', 'Tiwari', 'Nikhil Tiwari', 50, 'Male', '1975-08-08', '9822334455', 'nikhil.tiwari@gmail.com', 'Indiranagar, Bangalore', 'Star Health', 'Pooja Tiwari - 9822334466', 1, 'D101', '2025-09-27', 'Discharged', 'Medium', '212B', 'Angina', '2025-09-28', '2025-11-10', 'Responded to medication'),
-('P013', 'Tanya', 'Kapoor', 'Tanya Kapoor', 25, 'Female', '2000-10-18', '9833445566', 'tanya.kapoor@gmail.com', 'Andheri East, Mumbai', 'Max Bupa', 'Rohit Kapoor - 9833445577', 2, 'D102', '2025-09-29', 'In Treatment', 'Low', '213A', 'Insomnia', '2025-10-01', '2025-11-20', 'Sleep cycle improving'),
-('P014', 'Ajay', 'Bansal', 'Ajay Bansal', 48, 'Male', '1977-05-14', '9844556677', 'ajay.bansal@gmail.com', 'Civil Lines, Kanpur', 'HDFC Ergo', 'Neelam Bansal - 9844556688', 3, 'D103', '2025-09-30', 'In Treatment', 'Medium', '214B', 'Spinal disc injury', '2025-10-05', '2025-11-25', 'Physical therapy ongoing'),
-('P015', 'Divya', 'Pillai', 'Divya Pillai', 36, 'Female', '1989-02-11', '9855667788', 'divya.pillai@gmail.com', 'Ernakulam, Kochi', 'Reliance Health', 'Manoj Pillai - 9855667799', 4, 'D104', '2025-09-30', 'Discharged', 'Low', '215A', 'Irritable bowel syndrome', '2025-10-05', '2025-11-25', 'Diet control helping');
- 
- 
+(1,'Paracetamol'),
+(2,'Amoxicillin'),
+(3,'Aspirin'),
+(4,'Metformin'),
+(5,'Atorvastatin'),
+(6,'Omeprazole'),
+(7,'Ceftriaxone'),
+(8,'Salbutamol'),
+(9,'Diclofenac'),
+(10,'Captopril');
 
-INSERT INTO patients 
-(id, first_name, last_name, full_name, age, gender, date_of_birth, phone, email, address, insurance, emergency_contact, department_id, doctor_id, admission_date, status, severity, room, diagnosis, last_visit, next_appointment, notes)
+-- --------------------------
+-- 5) Allergies (6 common)
+-- --------------------------
+INSERT INTO allergies (id, name)
 VALUES
-('P016', 'Karthik', 'Reddy', 'Karthik Reddy', 30, 'Male', '1995-03-19', '9876543210', 'karthik.reddy@gmail.com', 'Banjara Hills, Hyderabad', 'HDFC Ergo', 'Suman Reddy - 9876543220', 5, 'D105', '2025-09-28', 'Discharged', 'Low', '216A', 'Viral fever and dehydration', '2025-09-30', '2025-11-05', 'Recovered well'),
-('P017', 'Ritu', 'Chauhan', 'Ritu Chauhan', 28, 'Female', '1997-09-08', '9821456789', 'ritu.chauhan@gmail.com', 'Sector 21, Gurugram', 'Star Health', 'Amit Chauhan - 9821456799', 6, 'D106', '2025-09-29', 'In Treatment', 'Medium', '217B', 'Typhoid fever', '2025-09-30', '2025-11-12', 'Fever under control'),
-('P018', 'Harsh', 'Gupta', 'Harsh Gupta', 42, 'Male', '1983-12-22', '9819988776', 'harsh.gupta@gmail.com', 'Powai, Mumbai', 'ICICI Lombard', 'Priya Gupta - 9819988788', 7, 'D107', '2025-09-27', 'In Treatment', 'High', '218A', 'Severe skin infection', '2025-09-29', '2025-11-08', 'Responding to antibiotics'),
-('P019', 'Meera', 'Iyer', 'Meera Iyer', 39, 'Female', '1986-07-03', '9823344112', 'meera.iyer@gmail.com', 'T Nagar, Chennai', 'Care Health', 'Ravi Iyer - 9823344223', 8, 'D108', '2025-09-30', 'Discharged', 'Low', '219B', 'Cataract surgery', '2025-10-02', '2025-11-10', 'Recovered fully'),
-('P020', 'Aditya', 'Singh', 'Aditya Singh', 50, 'Male', '1975-01-14', '9834455221', 'aditya.singh@gmail.com', 'Gomti Nagar, Lucknow', 'Max Bupa', 'Rashi Singh - 9834455332', 9, 'D109', '2025-09-28', 'In Treatment', 'High', '220A', 'Lung fibrosis', '2025-10-01', '2025-11-22', 'Under oxygen support'),
- 
-('P021', 'Preeti', 'Nair', 'Preeti Nair', 31, 'Female', '1994-02-09', '9845566678', 'preeti.nair@gmail.com', 'MG Road, Kochi', 'Bajaj Allianz', 'Anil Nair - 9845566690', 10, 'D110', '2025-09-26', 'Scheduled', 'Low', '221B', 'Pregnancy (checkup)', '2025-09-20', '2025-11-05', 'Routine checkup'),
-('P022', 'Vikram', 'Desai', 'Vikram Desai', 46, 'Male', '1979-04-25', '9856677781', 'vikram.desai@gmail.com', 'Kothrud, Pune', 'Star Health', 'Shalini Desai - 9856677792', 1, 'D101', '2025-09-29', 'In Treatment', 'Medium', '222A', 'Mild heart attack', '2025-10-02', '2025-11-25', 'On medication'),
-('P023', 'Priya', 'Shukla', 'Priya Shukla', 29, 'Female', '1996-06-11', '9867788892', 'priya.shukla@gmail.com', 'Aliganj, Lucknow', 'HDFC Ergo', 'Raj Shukla - 9867788802', 2, 'D102', '2025-09-25', 'In Treatment', 'Low', '223B', 'Anxiety disorder', '2025-09-27', '2025-11-14', 'Responding to therapy'),
-('P024', 'Amit', 'Ghosh', 'Amit Ghosh', 34, 'Male', '1991-08-22', '9878899903', 'amit.ghosh@gmail.com', 'Salt Lake, Kolkata', 'Reliance Health', 'Soma Ghosh - 9878899915', 3, 'D103', '2025-09-21', 'Discharged', 'Medium', '224A', 'Dislocated shoulder', '2025-09-29', '2025-11-19', 'Physical therapy advised'),
-('P025', 'Deepa', 'Rana', 'Deepa Rana', 44, 'Female', '1981-03-30', '9889900115', 'deepa.rana@gmail.com', 'Patel Nagar, Delhi', 'Max Bupa', 'Aakash Rana - 9889900226', 4, 'D104', '2025-09-23', 'In Treatment', 'Medium', '225B', 'Ulcer and indigestion', '2025-09-27', '2025-11-11', 'Under medication'),
- 
-('P026', 'Rohit', 'Malhotra', 'Rohit Malhotra', 40, 'Male', '1985-09-25', '9890011228', 'rohit.malhotra@gmail.com', 'Model Town, Delhi', 'ICICI Lombard', 'Divya Malhotra - 9890011239', 5, 'D105', '2025-09-22', 'Discharged', 'Low', '226C', 'Seasonal flu', '2025-09-28', '2025-11-18', 'Fully recovered'),
-('P027', 'Isha', 'Patel', 'Isha Patel', 37, 'Female', '1988-02-16', '9901122335', 'isha.patel@gmail.com', 'Vastrapur, Ahmedabad', 'Star Health', 'Dhruv Patel - 9901122446', 6, 'D106', '2025-09-24', 'In Treatment', 'Medium', '227B', 'Dengue', '2025-09-30', '2025-11-09', 'Recovery ongoing'),
-('P028', 'Vineet', 'Bhatnagar', 'Vineet Bhatnagar', 53, 'Male', '1972-07-10', '9811122256', 'vineet.bhatnagar@gmail.com', 'Jayanagar, Bangalore', 'Care Health', 'Sneha Bhatnagar - 9811133345', 7, 'D107', '2025-09-25', 'In Treatment', 'Medium', '228A', 'Severe skin rash', '2025-09-27', '2025-11-23', 'Ointment applied daily'),
-('P029', 'Kavita', 'Menon', 'Kavita Menon', 48, 'Female', '1977-10-03', '9822334467', 'kavita.menon@gmail.com', 'Thrissur, Kerala', 'Star Health', 'Manu Menon - 9822334478', 8, 'D108', '2025-09-21', 'Discharged', 'Low', '229B', 'Eye irritation', '2025-09-28', '2025-11-18', 'No infection now'),
-('P030', 'Naveen', 'Yadav', 'Naveen Yadav', 51, 'Male', '1974-12-01', '9833445579', 'naveen.yadav@gmail.com', 'Sector 62, Noida', 'HDFC Ergo', 'Poonam Yadav - 9833445580', 9, 'D109', '2025-09-19', 'Critical', 'High', '230A', 'Severe asthma', '2025-09-28', '2025-11-25', 'On ventilator support'),
- 
-('P031', 'Shweta', 'Pandey', 'Shweta Pandey', 33, 'Female', '1992-11-14', '9844556689', 'shweta.pandey@gmail.com', 'LDA Colony, Lucknow', 'Reliance Health', 'Amit Pandey - 9844556699', 10, 'D110', '2025-09-23', 'Scheduled', 'Low', '231B', 'Maternity routine', '2025-09-20', '2025-11-04', 'Next scan scheduled'),
-('P032', 'Sahil', 'Jain', 'Sahil Jain', 28, 'Male', '1997-05-08', '9855667790', 'sahil.jain@gmail.com', 'Shalimar Bagh, Delhi', 'Care Health', 'Anita Jain - 9855667801', 1, 'D101', '2025-09-25', 'In Treatment', 'Medium', '232A', 'Minor cardiac irregularities', '2025-09-29', '2025-11-15', 'On ECG monitoring'),
-('P033', 'Manisha', 'Gupta', 'Manisha Gupta', 46, 'Female', '1979-09-11', '9866778802', 'manisha.gupta@gmail.com', 'Ashok Nagar, Chennai', 'Bajaj Allianz', 'Karan Gupta - 9866778813', 2, 'D102', '2025-09-22', 'Discharged', 'Low', '233B', 'Sleep disorder', '2025-09-28', '2025-11-20', 'Improved sleep quality'),
-('P034', 'Rajeev', 'Kohli', 'Rajeev Kohli', 39, 'Male', '1986-04-06', '9877889914', 'rajeev.kohli@gmail.com', 'Baner, Pune', 'ICICI Lombard', 'Ritu Kohli - 9877889925', 3, 'D103', '2025-09-26', 'In Treatment', 'Medium', '234C', 'Knee ligament tear', '2025-09-30', '2025-11-22', 'Under physiotherapy'),
-('P035', 'Simran', 'Gill', 'Simran Gill', 24, 'Female', '2001-03-10', '9888990036', 'simran.gill@gmail.com', 'Model Town, Ludhiana', 'Max Bupa', 'Harpreet Gill - 9888990047', 4, 'D104', '2025-09-27', 'Discharged', 'Low', '235A', 'Food poisoning', '2025-09-30', '2025-11-19', 'Recovered'),
- 
-('P036', 'Varun', 'Mishra', 'Varun Mishra', 52, 'Male', '1973-08-18', '9899001148', 'varun.mishra@gmail.com', 'Sector 9, Chandigarh', 'Star Health', 'Sunita Mishra - 9899001159', 5, 'D105', '2025-09-25', 'Discharged', 'Medium', '236B', 'Chronic cough', '2025-09-29', '2025-11-26', 'Stable now'),
-('P037', 'Radhika', 'Patil', 'Radhika Patil', 29, 'Female', '1996-07-22', '9900112260', 'radhika.patil@gmail.com', 'Shivaji Nagar, Pune', 'Care Health', 'Ramesh Patil - 9900112271', 6, 'D106', '2025-09-30', 'In Treatment', 'Low', '237A', 'Viral infection', '2025-09-30', '2025-11-21', 'Stable'),
-('P038', 'Arvind', 'Joshi', 'Arvind Joshi', 58, 'Male', '1967-09-28', '9811223345', 'arvind.joshi@gmail.com', 'Paldi, Ahmedabad', 'HDFC Ergo', 'Meena Joshi - 9811334456', 7, 'D107', '2025-09-28', 'Discharged', 'Low', '238B', 'Skin eczema', '2025-09-29', '2025-11-27', 'Condition stable'),
-('P039', 'Sangeeta', 'Rao', 'Sangeeta Rao', 47, 'Female', '1978-02-05', '9822334468', 'sangeeta.rao@gmail.com', 'Basavanagudi, Bangalore', 'ICICI Lombard', 'Naveen Rao - 9822334479', 8, 'D108', '2025-09-27', 'In Treatment', 'Medium', '239C', 'Eye infection', '2025-09-30', '2025-11-18', 'Drops prescribed'),
-('P040', 'Nitin', 'Arora', 'Nitin Arora', 56, 'Male', '1969-01-02', '9833445581', 'nitin.arora@gmail.com', 'Sector 50, Noida', 'Star Health', 'Surbhi Arora - 9833445592', 9, 'D109', '2025-09-29', 'Critical', 'High', '240A', 'Severe COPD', '2025-09-30', '2025-11-28', 'ICU support'),
- 
+(1,'Penicillin'),
+(2,'NSAIDs'),
+(3,'Peanuts'),
+(4,'Seafood'),
+(5,'Latex'),
+(6,'None');
 
-('P041', 'Alka', 'Saxena', 'Alka Saxena', 34, 'Female', '1991-10-15', '9844556691', 'alka.saxena@gmail.com', 'Mahanagar, Lucknow', 'Max Bupa', 'Ravi Saxena - 9844556602', 10, 'D110', '2025-09-24', 'Scheduled', 'Low', '241B', 'Prenatal checkup', '2025-09-23', '2025-11-10', 'Next test due'),
-('P042', 'Raj', 'Singhal', 'Raj Singhal', 43, 'Male', '1982-09-05', '9855667703', 'raj.singhal@gmail.com', 'Rohini, Delhi', 'HDFC Ergo', 'Meenakshi Singhal - 9855667714', 1, 'D101', '2025-09-28', 'In Treatment', 'Medium', '242A', 'Irregular heartbeat', '2025-09-30', '2025-11-19', 'Monitoring ECG'),
-('P043', 'Tina', 'Puri', 'Tina Puri', 27, 'Female', '1998-11-07', '9866778825', 'tina.puri@gmail.com', 'Bandra East, Mumbai', 'Care Health', 'Arjun Puri - 9866778836', 2, 'D102', '2025-09-29', 'In Treatment', 'Low', '243B', 'Anxiety and stress', '2025-09-30', '2025-11-18', 'Stable'),
-('P044', 'Ashok', 'Menon', 'Ashok Menon', 59, 'Male', '1966-03-17', '9877889947', 'ashok.menon@gmail.com', 'Kottayam, Kerala', 'Star Health', 'Sangeeta Menon - 9877889958', 3, 'D103', '2025-09-30', 'Discharged', 'Low', '244C', 'Hip joint pain', '2025-09-30', '2025-11-25', 'Under mild exercise'),
-('P045', 'Riya', 'Bajaj', 'Riya Bajaj', 26, 'Female', '1999-08-19', '9888990069', 'riya.bajaj@gmail.com', 'Saket, Delhi', 'Max Bupa', 'Vikas Bajaj - 9888990070', 4, 'D104', '2025-09-27', 'Discharged', 'Low', '245A', 'Stomach infection', '2025-09-29', '2025-11-21', 'Recovered fully'),
- 
-('P046', 'Prakash', 'Nanda', 'Prakash Nanda', 61, 'Male', '1964-05-11', '9899001182', 'prakash.nanda@gmail.com', 'Bhubaneswar, Odisha', 'Bajaj Allianz', 'Sujata Nanda - 9899001193', 5, 'D105', '2025-09-26', 'In Treatment', 'Medium', '246B', 'Viral pneumonia', '2025-09-30', '2025-11-26', 'Improving gradually'),
-('P047', 'Meenakshi', 'Das', 'Meenakshi Das', 41, 'Female', '1984-02-03', '9900112284', 'meenakshi.das@gmail.com', 'Dispur, Guwahati', 'ICICI Lombard', 'Amit Das - 9900112295', 6, 'D106', '2025-09-30', 'In Treatment', 'Medium', '247A', 'Malaria', '2025-09-30', '2025-11-20', 'Stable now'),
-('P048', 'Sameer', 'Bose', 'Sameer Bose', 36, 'Male', '1989-07-30', '9811223366', 'sameer.bose@gmail.com', 'Howrah, Kolkata', 'Star Health', 'Naina Bose - 9811223377', 7, 'D107', '2025-09-29', 'Discharged', 'Low', '248B', 'Eczema flare-up', '2025-09-30', '2025-11-28', 'Improved'),
-('P049', 'Anita', 'Reddy', 'Anita Reddy', 53, 'Female', '1972-12-21', '9822334498', 'anita.reddy@gmail.com', 'Jubilee Hills, Hyderabad', 'Care Health', 'Kiran Reddy - 9822334409', 8, 'D108', '2025-09-25', 'Discharged', 'Low', '249C', 'Corneal infection', '2025-09-28', '2025-11-27', 'Cured'),
-('P050', 'Tarun', 'Kapoor', 'Tarun Kapoor', 48, 'Male', '1977-02-12', '9833445510', 'tarun.kapoor@gmail.com', 'Civil Lines, Delhi', 'Max Bupa', 'Sheetal Kapoor - 9833445521', 9, 'D109', '2025-09-28', 'Critical', 'High', '250A', 'Lung cancer stage 3', '2025-09-29', '2025-11-30', 'Chemotherapy ongoing');
- 
-
-
-INSERT INTO patient_vitals_current 
-(patient_id, blood_pressure, heart_rate, temperature, oxygen_saturation, weight, height)
+-- --------------------------
+-- 6) Patients (50 patients)
+-- ids P001..P050
+-- --------------------------
+INSERT INTO patients (id, first_name, last_name, full_name, age, gender, date_of_birth, phone, email, address, insurance, emergency_contact, department_id, doctor_id, admission_date, status, severity, room, diagnosis, last_visit, next_appointment, notes)
 VALUES
-('P001', '120/80', 78, 98.6, 98, 72.5, 170),
-('P002', '130/85', 82, 99.1, 97, 65.2, 160),
-('P003', '110/70', 76, 98.2, 99, 80.3, 175),
-('P004', '125/90', 90, 100.4, 95, 60.4, 162),
-('P005', '140/95', 105, 101.2, 93, 82.1, 173),
-('P006', '118/78', 74, 98.5, 98, 68.7, 168),
-('P007', '122/82', 80, 98.7, 97, 70.1, 165),
-('P008', '115/75', 72, 98.0, 99, 62.9, 159),
-('P009', '128/88', 85, 99.3, 96, 77.2, 172),
-('P010', '135/90', 92, 100.1, 94, 85.5, 180);
- 
+('P001','Rahul','Mehta','Rahul Mehta',45,'Male','1980-06-15','9811000001','rahul.mehta@example.com','C-22, Lajpat Nagar, Delhi','Star Health','Rohit Mehta - 9811000002',5,'S007','2025-09-05','Discharged','High','D101','Hypertension','2025-10-20','2025-11-10','Follow-up required'),
+('P002','Sneha','Kumar','Sneha Kumar',32,'Female','1993-02-11','9811000003','sneha.kumar@example.com','Flat 5B, Andheri West, Mumbai','ICICI Lombard','Ankit Kumar - 9811000004',1,'S001','2025-10-12','In Treatment','Medium','C204','Chest Pain','2025-10-30','2025-11-04','EKG monitoring'),
+('P003','Amit','Sharma','Amit Sharma',58,'Male','1967-11-20','9811000005','amit.sharma@example.com','House 9, Model Town, Delhi','HDFC ERGO','Suman Sharma - 9811000006',1,'S002','2025-10-25','In Treatment','High','C102','Post MI','2025-10-31','2025-11-12','On beta blockers'),
+('P004','Pooja','Verma','Pooja Verma',27,'Female','1998-04-03','9811000007','pooja.verma@example.com','Sector 12, Noida','Star Health','Ravi Verma - 9811000008',4,'S006','2025-11-01','In Treatment','Low','P303','Fever & Cold','2025-11-01','2025-11-15','Pediatric consult (adult family member)'),
+('P005','Rakesh','Gupta','Rakesh Gupta',39,'Male','1986-09-28','9811000009','rakesh.gupta@example.com','MG Road, Bengaluru','Apollo Munich','Renu Gupta - 9811000010',5,'S022','2025-08-20','Discharged','Low','G210','Gastritis','2025-10-05','2026-01-10','Diet advised'),
+('P006','Neha','Patel','Neha Patel',22,'Female','2003-01-17','9811000011','neha.patel@example.com','Juhu, Mumbai','Star Health','Krishna Patel - 9811000012',4,'S006','2025-09-20','Discharged','Low','P118','Bronchitis','2025-09-22','2025-10-20','Inhaler given'),
+('P007','Vijay','Rao','Vijay Rao',66,'Male','1959-03-02','9811000013','vijay.rao@example.com','Baner, Pune','HDFC ERGO','Lakshmi Rao - 9811000014',1,'S001','2025-10-02','In Treatment','High','C110','Heart Failure','2025-10-28','2025-11-15','Monitor fluid status'),
+('P008','Kavya','Nair','Kavya Nair',5,'Female','2020-08-10','9811000015','kavya.nair@example.com','Anna Nagar, Chennai','Star Health','Sophie Nair - 9811000016',4,'S006','2025-11-03','In Treatment','Low','P201','Acute Otitis Media','2025-11-03','2025-11-10','Pain management'),
+('P009','Manoj','Saxena','Manoj Saxena',50,'Male','1975-12-05','9811000017','manoj.saxena@example.com','Civil Lines, Jaipur','National Insurance','Sunita Saxena - 9811000018',2,'S003','2025-10-18','Discharged','Medium','O310','Knee Pain','2025-10-25','2025-11-20','Physio recommended'),
+('P010','Divya','Singh','Divya Singh',29,'Female','1996-07-21','9811000019','divya.singh@example.com','Patna Colony, Patna','Star Health','Pavan Singh - 9811000020',5,'S007','2025-11-01','Scheduled','Low','G302','Diabetes Check','2025-11-01','2025-11-25','HbA1c due'),
+('P011','Suresh','Khan','Suresh Khan',72,'Male','1953-10-12','9811000021','suresh.khan@example.com','MG Road, Lucknow','Bajaj Allianz','Rehana Khan - 9811000022',6,'S008','2025-11-02','In Treatment','High','E001','Multiple Trauma','2025-11-02','2025-11-10','ICU observation'),
+('P012','Radha','Desai','Radha Desai',38,'Female','1987-05-04','9811000023','radha.desai@example.com','Vile Parle, Mumbai','Star Health','Manish Desai - 9811000024',8,'S010','2025-10-29','Discharged','Low','ENT12','Chronic Ear Infection','2025-10-29','2025-11-20','Ear drops ongoing'),
+('P013','Aakash','Bhatia','Aakash Bhatia',31,'Male','1994-03-14','9811000025','aakash.bhatia@example.com','Kothrud, Pune','HDFC ERGO','Rita Bhatia - 9811000026',5,'S029','2025-09-30','Discharged','Medium','G110','Acute Abdomen','2025-10-08','2025-11-05','Surgery done'),
+('P014','Maya','Rao','Maya Rao',44,'Female','1981-11-02','9811000027','maya.rao@example.com','Bangalore East, Bengaluru','ICICI Lombard','Sunil Rao - 9811000028',7,'S009','2025-07-15','In Treatment','High','O201','Chemotherapy','2025-10-15','2025-11-20','Cycle 3'),
+('P015','Aditya','Malhotra','Aditya Malhotra',55,'Male','1970-06-30','9811000029','aditya.malhotra@example.com','Sector 21, Chandigarh','Star Health','Neeta Malhotra - 9811000030',3,'S005','2025-10-10','Scheduled','Medium','N410','Migraine','2025-10-10','2025-11-11','Neuro follow-up'),
+('P016','Shruti','Iyer','Shruti Iyer',19,'Female','2006-02-02','9811000031','shruti.iyer@example.com','Coimbatore','Apollo Munich','Ramesh Iyer - 9811000032',5,'S022','2025-10-01','Discharged','Low','G220','Viral Fever','2025-10-03','2025-12-01','Rest advised'),
+('P017','Rohit','Kohli','Rohit Kohli',34,'Male','1991-09-11','9811000033','rohit.kohli@example.com','Ashok Vihar, Delhi','Star Health','Meera Kohli - 9811000034',1,'S001','2025-10-21','In Treatment','Medium','C305','Arrhythmia','2025-10-28','2025-11-30','Holter scheduled'),
+('P018','Komal','Shah','Komal Shah',47,'Female','1978-08-19','9811000035','komal.shah@example.com','Vadodara','HDFC ERGO','Pranav Shah - 9811000036',2,'S003','2025-09-25','Discharged','Low','O112','Fracture Follow-up','2025-10-12','2025-11-02','Cast removal'),
+('P019','Yusuf','Ansari','Yusuf Ansari',60,'Male','1965-01-01','9811000037','yusuf.ansari@example.com','Old Hyderabad','National Insurance','Zeenat Ansari - 9811000038',6,'S008','2025-11-03','In Treatment','High','E102','Severe Head Injury','2025-11-03','2025-11-20','Neuro consult'),
+('P020','Bhavna','Bhosle','Bhavna Bhosle',28,'Female','1997-12-07','9811000039','bhavna.bhosle@example.com','Kolhapur','Star Health','Mehul Bhosle - 9811000040',4,'S006','2025-10-24','Discharged','Low','P112','Allergic Rhinitis','2025-10-28','2025-12-15','Antihistamines'),
+('P021','Kunal','Patel','Kunal Patel',41,'Male','1984-04-19','9811000041','kunal.patel@example.com','Surat','ICICI Lombard','Lalita Patel - 9811000042',5,'S007','2025-09-15','Discharged','Low','G401','Hypertension','2025-10-01','2025-11-06','Medication adjusted'),
+('P022','Leela','Khan','Leela Khan',63,'Female','1962-06-06','9811000043','leela.khan@example.com','Patiala','Bajaj Allianz','Aamir Khan - 9811000044',3,'S005','2025-10-18','In Treatment','Medium','N201','Dementia Assessment','2025-10-20','2025-11-19','Cognitive tests'),
+('P023','Sahil','Verma','Sahil Verma',37,'Male','1988-03-08','9811000045','sahil.verma@example.com','Dwarka, Delhi','HDFC ERGO','Rita Verma - 9811000046',2,'S004','2025-11-01','In Treatment','Medium','O220','Shoulder Pain','2025-11-01','2025-11-29','Injections given'),
+('P024','Nandini','Rao','Nandini Rao',52,'Female','1973-05-30','9811000047','nandini.rao@example.com','Gandhinagar','ICICI Lombard','Karan Rao - 9811000048',7,'S009','2025-08-05','Discharged','High','ONC05','Breast Cancer Follow-up','2025-10-30','2026-01-05','Radiology scheduled'),
+('P025','Tejas','Kulkarni','Tejas Kulkarni',30,'Male','1995-11-23','9811000049','tejas.kulkarni@example.com','Pune Camp, Pune','Star Health','Maya Kulkarni - 9811000050',2,'S003','2025-10-06','Discharged','Low','O330','ACL Sprain','2025-10-12','2025-11-25','Physio plan'),
+('P026','Ila','Mishra','Ila Mishra',48,'Female','1977-02-14','9811000051','ila.mishra@example.com','Bhopal','National Insurance','Rakesh Mishra - 9811000052',5,'S022','2025-09-25','Discharged','Medium','G330','Gallstones','2025-10-01','2025-11-14','Post-op diet'),
+('P027','Pranav','Bhatt','Pranav Bhatt',26,'Male','1999-07-04','9811000053','pranav.bhatt@example.com','Thane','Apollo Munich','Nita Bhatt - 9811000054',6,'S008','2025-11-02','In Treatment','Medium','E210','Road Traffic Injury','2025-11-02','2025-11-18','Orthopedic review'),
+('P028','Mrunal','Deshpande','Mrunal Deshpande',33,'Female','1992-01-09','9811000055','mrunal.deshpande@example.com','Wakad, Pune','Star Health','Siddharth Deshpande - 9811000056',8,'S010','2025-10-19','Discharged','Low','ENT22','Tonsillitis','2025-10-20','2025-11-25','Complete course'),
+('P029','Anuj','Saxena','Anuj Saxena',46,'Male','1979-06-25','9811000057','anuj.saxena@example.com','Sector 9, Noida','HDFC ERGO','Geeta Saxena - 9811000058',1,'S002','2025-09-10','Discharged','Medium','C202','Coronary Angiography','2025-09-12','2025-11-02','Stent placed'),
+('P030','Gauri','Nath','Gauri Nath',24,'Female','2001-10-16','9811000059','gauri.nath@example.com','Rajarhat, Kolkata','Star Health','Kamal Nath - 9811000060',4,'S006','2025-10-05','Discharged','Low','P110','Bronchiolitis','2025-10-07','2025-11-21','Vaccination up-to-date'),
+('P031','Harish','Shah','Harish Shah',68,'Male','1957-12-30','9811000061','harish.shah@example.com','Ahmedabad','Bajaj Allianz','Meera Shah - 9811000062',3,'S005','2025-11-01','In Treatment','High','N330','Parkinsons','2025-10-28','2025-11-22','Medication review'),
+('P032','Rina','Bose','Rina Bose',53,'Female','1972-08-24','9811000063','rina.bose@example.com','Kolkata Central','ICICI Lombard','Sukumar Bose - 9811000064',5,'S022','2025-10-27','Discharged','Medium','G220','Ulcerative Colitis','2025-10-29','2025-11-30','GI follow-up'),
+('P033','Mayank','Jain','Mayank Jain',36,'Male','1989-05-02','9811000065','mayank.jain@example.com','Indore','Star Health','Anita Jain - 9811000066',2,'S004','2025-10-13','Discharged','Low','O110','Ankle Sprain','2025-10-15','2025-11-20','Rehab'),
+('P034','Sana','Khan','Sana Khan',17,'Female','2008-09-09','9811000067','sana.khan@example.com','Aligarh','Star Health','Zubair Khan - 9811000068',4,'S006','2025-11-03','In Treatment','Low','P305','Tonsil Stones','2025-11-03','2025-11-10','ENT review'),
+('P035','Vikash','Yadav','Vikash Yadav',49,'Male','1976-04-04','9811000069','vikash.yadav@example.com','Gaya','National Insurance','Meena Yadav - 9811000070',5,'S022','2025-09-02','Discharged','Medium','G500','Liver Function Abnormal','2025-09-10','2025-11-11','Lifestyle advised'),
+('P036','Farah','Aziz','Farah Aziz',42,'Female','1983-06-06','9811000071','farah.aziz@example.com','Srinagar','Star Health','Aamir Aziz - 9811000072',7,'S009','2025-10-18','In Treatment','High','ONC12','Leukemia','2025-10-28','2025-11-24','Chemotherapy'),
+('P037','Rajat','Bajpai','Rajat Bajpai',61,'Male','1964-11-11','9811000073','rajat.bajpai@example.com','Meerut','HDFC ERGO','Vandana Bajpai - 9811000074',1,'S001','2025-10-06','Discharged','Medium','C410','Hypertensive Crisis','2025-10-08','2025-11-07','BP meds changed'),
+('P038','Nisha','Garg','Nisha Garg',35,'Female','1990-12-12','9811000075','nisha.garg@example.com','Jalandhar','Star Health','Himanshu Garg - 9811000076',8,'S010','2025-10-02','Discharged','Low','ENT05','Sinusitis','2025-10-05','2025-11-10','Nasal spray'),
+('P039','Lokesh','Jain','Lokesh Jain',27,'Male','1998-05-28','9811000077','lokesh.jain@example.com','Ujjain','ICICI Lombard','Renu Jain - 9811000078',2,'S003','2025-11-02','In Treatment','Low','O404','Fracture Care','2025-11-02','2025-11-20','Cast care'),
+('P040','Tanya','Chawla','Tanya Chawla',21,'Female','2004-02-14','9811000079','tanya.chawla@example.com','Shimla','Star Health','Vikram Chawla - 9811000080',4,'S006','2025-10-11','Discharged','Low','P210','Viral Exanthem','2025-10-13','2025-11-30','Skin care'),
+('P041','Imran','Siddiqui','Imran Siddiqui',54,'Male','1971-07-07','9811000081','imran.siddiqui@example.com','Patel Nagar, Delhi','Bajaj Allianz','Zainab Siddiqui - 9811000082',6,'S008','2025-10-29','In Treatment','High','E450','Chest Trauma','2025-10-29','2025-11-19','Surgical consult'),
+('P042','Sheetal','Verghese','Sheetal Verghese',46,'Female','1979-03-03','9811000083','sheetal.verghese@example.com','Kochi','HDFC ERGO','Thomas Verghese - 9811000084',5,'S022','2025-10-02','Discharged','Medium','G701','Thyroiditis','2025-10-10','2025-11-17','TSH repeat'),
+('P043','Aarav','Shukla','Aarav Shukla',8,'Male','2017-04-01','9811000085','aarav.shukla@example.com','Varanasi','Star Health','Neha Shukla - 9811000086',4,'S006','2025-11-03','In Treatment','Low','P501','Infant Fever','2025-11-03','2025-11-10','Pediatric observation'),
+('P044','Neeraj','Bhargava','Neeraj Bhargava',59,'Male','1966-02-02','9811000087','neeraj.bhargava@example.com','Ghaziabad','National Insurance','Sunita Bhargava - 9811000088',1,'S024','2025-09-12','Discharged','Medium','C220','Coronary Check','2025-09-15','2025-11-12','Stress test'),
+('P045','Riya','Bansal','Riya Bansal',26,'Female','1999-08-20','9811000089','riya.bansal@example.com','Gurgaon','Star Health','Amit Bansal - 9811000090',5,'S007','2025-10-01','Discharged','Low','G210','UTI','2025-10-03','2025-11-01','Complete antibiotics'),
+('P046','Suman','Roy','Suman Roy',70,'Female','1955-05-05','9811000091','suman.roy@example.com','Ranchi','ICICI Lombard','Bharat Roy - 9811000092',3,'S005','2025-10-19','In Treatment','High','N601','Stroke Rehab','2025-10-20','2025-11-30','Physio ongoing'),
+('P047','Harsha','Menon','Harsha Menon',43,'Male','1982-11-11','9811000093','harsha.menon@example.com','Thiruvananthapuram','Star Health','Leela Menon - 9811000094',8,'S010','2025-10-21','Discharged','Low','ENT09','Vertigo','2025-10-25','2025-11-13','Vestibular exercises'),
+('P048','Kavita','Saxena','Kavita Saxena',31,'Female','1994-06-06','9811000095','kavita.saxena@example.com','Jodhpur','Star Health','Nitin Saxena - 9811000096',2,'S003','2025-11-03','Scheduled','Low','O501','ACL Repair','2025-11-03','2025-11-30','Pre-op'),
+('P049','Mayuri','Desai','Mayuri Desai',29,'Female','1996-03-03','9811000097','mayuri.desai@example.com','Baroda','Apollo Munich','Prakash Desai - 9811000098',5,'S022','2025-10-14','Discharged','Low','G802','IBS','2025-10-20','2026-01-25','Diet plan'),
+('P050','Siddharth','Ghosh','Siddharth Ghosh',38,'Male','1987-12-12','9811000099','siddharth.ghosh@example.com','Salt Lake, Kolkata','Star Health','Rina Ghosh - 9811000100',5,'S022','2025-09-10','Discharged','Medium','G250','Hypertension & Diabetes','2025-10-11','2025-11-05','Dual meds');
 
-
-INSERT INTO patient_vital_history
-(patient_id, date, heart_rate, blood_pressure, temperature, oxygen_saturation)
+-- --------------------------
+-- 7) patient_vitals_current (50 rows)
+-- --------------------------
+INSERT INTO patient_vitals_current (patient_id, blood_pressure, heart_rate, temperature, oxygen_saturation, weight, height)
 VALUES
-('P001', '2025-10-28', 78, '120/80', 98.6, 98),
-('P001', '2025-10-29', 80, '122/82', 99.0, 97),
-('P001', '2025-10-30', 76, '118/78', 98.5, 99),
-('P002', '2025-10-28', 84, '130/85', 98.9, 96),
-('P002', '2025-10-29', 85, '132/86', 99.1, 97),
-('P002', '2025-10-30', 83, '128/84', 98.8, 98);
- 
+('P001','140/90',78,98.6,96,78.5,172.0),
+('P002','130/85',86,99.1,97,60.0,165.0),
+('P003','150/95',92,98.9,95,82.0,175.0),
+('P004','110/70',78,99.0,98,55.0,162.0),
+('P005','118/76',72,98.4,99,68.0,170.0),
+('P006','115/74',88,99.2,97,52.0,160.0),
+('P007','160/100',88,98.7,94,85.0,178.0),
+('P008','105/65',110,99.5,99,18.0,108.0),
+('P009','122/80',76,98.6,98,75.0,168.0),
+('P010','128/82',80,98.8,98,58.0,162.0),
+('P011','135/88',102,99.6,92,80.0,170.0),
+('P012','120/78',74,98.5,99,63.0,165.0),
+('P013','125/80',82,98.7,98,70.0,172.0),
+('P014','118/76',70,99.0,97,55.0,160.0),
+('P015','138/86',84,98.8,96,80.0,174.0),
+('P016','110/70',76,98.3,99,54.0,161.0),
+('P017','142/90',90,99.2,95,77.0,173.0),
+('P018','128/82',78,98.6,98,72.0,171.0),
+('P019','150/95',110,100.2,89,82.0,176.0),
+('P020','112/72',72,98.4,99,47.0,155.0),
+('P021','134/84',80,98.9,97,76.0,170.0),
+('P022','130/86',78,99.1,96,62.0,162.0),
+('P023','126/80',88,98.7,98,74.0,169.0),
+('P024','140/90',92,99.3,94,68.0,160.0),
+('P025','118/76',78,98.5,99,70.0,171.0),
+('P026','122/78',86,98.8,97,75.0,173.0),
+('P027','135/90',98,99.4,94,82.0,176.0),
+('P028','110/70',72,98.6,99,60.0,165.0),
+('P029','148/92',88,99.1,95,88.0,179.0),
+('P030','108/68',90,99.0,98,50.0,158.0),
+('P031','160/100',84,98.8,95,85.0,172.0),
+('P032','130/80',76,98.6,98,66.0,168.0),
+('P033','118/74',74,98.4,99,68.0,170.0),
+('P034','100/60',98,99.5,99,50.0,155.0),
+('P035','136/88',82,98.7,97,72.0,169.0),
+('P036','142/90',88,99.6,93,60.0,162.0),
+('P037','150/94',86,98.9,95,84.0,175.0),
+('P038','118/76',76,98.4,99,62.0,164.0),
+('P039','128/80',90,99.1,98,78.0,176.0),
+('P040','110/70',86,99.0,99,56.0,160.0),
+('P041','145/92',96,99.4,92,86.0,178.0),
+('P042','118/76',78,98.9,98,69.0,167.0),
+('P043','100/64',108,99.6,99,12.5,95.0),
+('P044','130/82',80,98.7,97,82.0,174.0),
+('P045','116/72',76,98.4,99,54.0,161.0),
+('P046','155/98',90,99.0,94,70.0,165.0),
+('P047','120/78',72,98.6,99,66.0,168.0),
+('P048','130/84',88,99.2,97,79.0,177.0),
+('P049','112/70',76,98.5,99,58.0,162.0),
+('P050','140/88',82,98.9,96,80.0,175.0);
 
-INSERT INTO appointments 
-(id, patient_id, staff_id, date, time, department_id, type, status, duration, notes)
+-- --------------------------
+-- 8) patient_vital_history (one entry per patient)
+-- --------------------------
+INSERT INTO patient_vital_history (patient_id, date, heart_rate, blood_pressure, temperature, oxygen_saturation)
 VALUES
-('A1001', 'P001', 'D101', '2025-11-01', '10:00:00', 1, 'Consultation', 'Completed', 30, 'Routine checkup done'),
-('A1002', 'P002', 'D102', '2025-11-01', '11:00:00', 2, 'Follow-up', 'Scheduled', 20, 'MRI follow-up visit'),
-('A1003', 'P003', 'D103', '2025-11-02', '09:30:00', 3, 'Surgery Review', 'Completed', 45, 'Orthopedic post-surgery review'),
-('A1004', 'P004', 'D104', '2025-11-02', '12:00:00', 4, 'Consultation', 'Completed', 25, 'Digestive issue'),
-('A1005', 'P005', 'D105', '2025-11-03', '13:00:00', 5, 'Routine Check', 'Pending', 30, 'General examination');
- 
+('P001','2025-10-30',80,'138/88',98.6,96),
+('P002','2025-10-28',84,'130/84',99.0,97),
+('P003','2025-10-26',90,'150/94',99.1,95),
+('P004','2025-11-01',76,'110/70',99.0,98),
+('P005','2025-10-05',70,'118/76',98.5,99),
+('P006','2025-09-21',86,'115/74',99.2,97),
+('P007','2025-10-25',87,'158/98',98.7,94),
+('P008','2025-11-03',112,'104/64',99.6,99),
+('P009','2025-10-24',74,'122/80',98.6,98),
+('P010','2025-10-30',79,'128/82',98.8,98),
+('P011','2025-11-02',100,'135/88',99.6,92),
+('P012','2025-10-28',72,'120/78',98.5,99),
+('P013','2025-10-08',80,'125/80',98.7,98),
+('P014','2025-10-14',68,'118/76',99.0,97),
+('P015','2025-10-09',82,'138/86',98.8,96),
+('P016','2025-10-02',74,'110/70',98.3,99),
+('P017','2025-10-28',88,'142/90',99.1,95),
+('P018','2025-10-12',76,'128/82',98.6,98),
+('P019','2025-11-03',108,'150/94',100.3,89),
+('P020','2025-10-27',70,'112/72',98.4,99),
+('P021','2025-10-01',78,'134/84',98.9,97),
+('P022','2025-10-19',76,'130/86',99.0,96),
+('P023','2025-10-31',88,'126/80',98.7,98),
+('P024','2025-10-30',90,'140/90',99.3,94),
+('P025','2025-10-11',76,'118/76',98.5,99),
+('P026','2025-10-01',84,'122/78',98.8,97),
+('P027','2025-11-02',96,'132/86',99.3,95),
+('P028','2025-10-19',70,'110/70',98.6,99),
+('P029','2025-09-12',86,'148/92',99.0,95),
+('P030','2025-10-07',88,'108/68',99.0,98),
+('P031','2025-10-28',82,'160/100',98.8,95),
+('P032','2025-10-18',74,'130/80',98.6,98),
+('P033','2025-10-13',72,'118/74',98.4,99),
+('P034','2025-11-03',100,'100/60',99.5,99),
+('P035','2025-09-09',80,'136/88',98.7,97),
+('P036','2025-10-27',86,'142/90',99.4,93),
+('P037','2025-10-06',84,'150/94',98.9,95),
+('P038','2025-10-03',74,'118/76',98.4,99),
+('P039','2025-11-02',92,'128/80',99.1,98),
+('P040','2025-10-11',84,'110/70',99.0,99),
+('P041','2025-10-29',94,'145/92',99.4,92),
+('P042','2025-10-09',76,'118/76',98.9,98),
+('P043','2025-11-03',110,'100/64',99.6,99),
+('P044','2025-09-14',80,'130/82',98.7,97),
+('P045','2025-10-03',74,'116/72',98.4,99),
+('P046','2025-10-20',88,'155/98',99.0,94),
+('P047','2025-10-21',72,'120/78',98.6,99),
+('P048','2025-11-03',90,'130/84',99.2,97),
+('P049','2025-10-14',76,'112/70',98.5,99),
+('P050','2025-09-11',82,'140/88',98.9,96);
 
-INSERT INTO medications (id, name) VALUES
-(1, 'Paracetamol 500mg'),
-(2, 'Amoxicillin 250mg'),
-(3, 'Azithromycin 500mg'),
-(4, 'Cetirizine 10mg'),
-(5, 'Pantoprazole 40mg'),
-(6, 'Metformin 500mg'),
-(7, 'Losartan 50mg'),
-(8, 'Atorvastatin 10mg'),
-(9, 'Ibuprofen 400mg'),
-(10, 'Omeprazole 20mg');
- 
-
-
-INSERT INTO patient_medications (patient_id, medication_id) VALUES
-('P001', 1), 
-('P001', 5),
-('P002', 2),
-('P003', 3), 
-('P003', 9),
-('P004', 1),
-('P005', 7), 
-('P005', 10),
-('P006', 4),
-('P007', 1), 
-('P007', 6),
-('P008', 8),
-('P009', 2), 
-('P009', 5),
-('P010', 1), 
-('P010', 9),
-('P011', 3),
-('P012', 1), 
-('P012', 7),
-('P013', 4), 
-('P013', 5),
-('P014', 9),
-('P015', 1), 
-('P015', 8),
-('P016', 2), 
-('P016', 10),
-('P017', 6),
-('P018', 1), 
-('P018', 4),
-('P019', 3),
-('P020', 8), 
-('P020', 10),
-('P021', 2), 
-('P021', 9),
-('P022', 1),
-('P023', 3), 
-('P023', 5),
-('P024', 7),
-('P025', 4), 
-('P025', 10),
-('P026', 2), 
-('P026', 6),
-('P027', 1), 
-('P027', 9),
-('P028', 3),
-('P029', 5), 
-('P029', 8),
-('P030', 1),
-('P031', 2), 
-('P031', 4),
-('P032', 9), 
-('P032', 10),
-('P033', 6),
-('P034', 3), 
-('P034', 5),
-('P035', 8),
-('P036', 1), 
-('P036', 2),
-('P037', 4),
-('P038', 6), 
-('P038', 7),
-('P039', 9),
-('P040', 10),
-('P041', 1), 
-('P041', 8),
-('P042', 3),
-('P043', 2), 
-('P043', 5),
-('P044', 4),
-('P045', 6),
-('P046', 7), 
-('P046', 9),
-('P047', 10),
-('P048', 1),
-('P049', 5),
-('P050', 8);
- 
-
-
-INSERT INTO allergies (id, name) VALUES
-(1, 'Penicillin'),
-(2, 'Peanuts'),
-(3, 'Dust'),
-(4, 'Pollen'),
-(5, 'Seafood'),
-(6, 'Lactose'),
-(7, 'Latex'),
-(8, 'Aspirin'),
-(9, 'InsectBites'),
-(10, 'Cold Weather');
- 
-
-
-INSERT INTO patient_allergies (patient_id, allergy_id) VALUES
-('P001', 2),
-('P002', 4),
-('P003', 1), 
-('P003', 5),
-('P004', 3),
-('P005', 6),
-('P006', 1), 
-('P006', 8),
-('P007', 9),
-('P008', 4),
-('P009', 2),
-('P010', 7),
-('P011', 3),
-('P012', 5),
-('P013', 1),
-('P014', 8),
-('P015', 10),
-('P016', 2), 
-('P016', 6),
-('P017', 4),
-('P018', 3), 
-('P018', 9),
-('P019', 7),
-('P020', 1),
-('P021', 8),
-('P022', 6),
-('P023', 3),
-('P024', 5),
-('P025', 9),
-('P026', 2),
-('P027', 10),
-('P028', 4), 
-('P028', 7),
-('P029', 1),
-('P030', 8),
-('P031', 5),
-('P032', 6), 
-('P032', 9),
-('P033', 2),
-('P034', 3),
-('P035', 4),
-('P036', 10),
-('P037', 1), 
-('P037', 8),
-('P038', 7),
-('P039', 2),
-('P040', 5),
-('P041', 3),
-('P042', 9),
-('P043', 6),
-('P044', 8),
-('P045', 10),
-('P046', 1),
-('P047', 4),
-('P048', 5),
-('P049', 2),
-('P050', 9);
- 
-
-INSERT INTO timeline_events (id, patient_id, date, title, description, type) VALUES
-('TE001', 'P001', '2025-10-20', 'Patient Admitted', 'Admitted for chest pain and continuous cough.', 'admission'),
-('TE002', 'P001', '2025-10-23', 'Discharged from Cardiology', 'Recovered after observation and medication.', 'discharge'),
-('TE003', 'P002', '2025-10-25', 'General Checkup', 'Routine blood pressure and sugar level check.', 'visit'),
-('TE004', 'P003', '2025-10-15', 'Appendix Surgery', 'Appendectomy performed successfully by Dr. Mehta.', 'surgery'),
-('TE005', 'P003', '2025-10-25', 'Follow-up Visit', 'Post-surgery wound healing observed to be good.', 'visit'),
-('TE006', 'P004', '2025-10-22', 'Lab Test', 'Blood test for cholesterol and liver enzymes.', 'test'),
-('TE007', 'P005', '2025-09-30', 'Admitted to Ortho', 'Admitted for severe knee pain.', 'admission'),
-('TE008', 'P005', '2025-10-02', 'MRI and Discharge', 'MRI performed, advised physiotherapy sessions.', 'discharge'),
-('TE009', 'P006', '2025-10-28', 'Neurology Visit', 'Follow-up for migraine treatment.', 'visit'),
-('TE010', 'P007', '2025-10-29', 'Diagnostic Tests', 'ECG and blood sugar test conducted.', 'test'),
-('TE011', 'P008', '2025-10-05', 'Fever Admission', 'Admitted due to high fever and fatigue.', 'admission'),
-('TE012', 'P008', '2025-10-07', 'Discharged', 'Diagnosed with viral fever, recovered fully.', 'discharge'),
-('TE013', 'P009', '2025-09-15', 'ENT Surgery', 'Minor sinus cleaning surgery performed.', 'surgery'),
-('TE014', 'P010', '2025-10-10', 'Heart Checkup', 'Routine cardiology appointment for BP monitoring.', 'visit'),
-('TE015', 'P011', '2025-10-11', 'Asthma Admission', 'Admitted due to shortness of breath.', 'admission'),
-('TE016', 'P011', '2025-10-13', 'Discharge', 'Condition improved, discharged with inhaler prescription.', 'discharge'),
-('TE017', 'P012', '2025-10-24', 'Liver Test', 'LFT and CBC done to monitor liver health.', 'test'),
-('TE018', 'P013', '2025-10-18', 'Post-Surgery Check', 'Regular wound healing assessment.', 'visit'),
-('TE019', 'P014', '2025-10-19', 'Eye Check', 'Vision and retina test performed.', 'test'),
-('TE020', 'P015', '2025-10-01', 'Ortho Admission', 'Admitted for leg fracture due to accident.', 'admission'),
-('TE021', 'P015', '2025-10-02', 'Surgery', 'Fracture fixation surgery completed.', 'surgery'),
-('TE022', 'P015', '2025-10-06', 'Discharge', 'Discharged with physiotherapy recommendation.', 'discharge'),
-('TE023', 'P016', '2025-10-26', 'Annual Health Check', 'General checkup done, advised to maintain diet.', 'visit'),
-('TE024', 'P017', '2025-10-28', 'Thyroid Test', 'Blood test to monitor thyroid level.', 'test'),
-('TE025', 'P018', '2025-10-10', 'Emergency Admission', 'Admitted for dehydration and weakness.', 'admission'),
-('TE026', 'P018', '2025-10-12', 'Discharge', 'Recovered after IV fluid therapy.', 'discharge'),
-('TE027', 'P019', '2025-10-25', 'Follow-up Visit', 'Regular medicine evaluation visit.', 'visit'),
-('TE028', 'P020', '2025-10-22', 'Lab Test', 'Urine and cholesterol profile test conducted.', 'test'),
-('TE029', 'P021', '2025-09-28', 'Accident Admission', 'Admitted with wrist fracture.', 'admission'),
-('TE030', 'P021', '2025-09-29', 'Fracture Surgery', 'Bone plating done by orthopedic surgeon.', 'surgery'),
-('TE031', 'P022', '2025-10-26', 'ENT Visit', 'Ear infection treated with antibiotics.', 'visit'),
-('TE032', 'P023', '2025-10-24', 'Follow-up Visit', 'Review after antibiotic medication course.', 'visit'),
-('TE033', 'P024', '2025-10-23', 'Thyroid Test', 'TSH, T3, T4 levels checked.', 'test'),
-('TE034', 'P025', '2025-10-20', 'BP Emergency', 'Admitted for extremely high blood pressure.', 'admission'),
-('TE035', 'P025', '2025-10-22', 'Discharged', 'Blood pressure stabilized after 2 days.', 'discharge'),
-('TE036', 'P026', '2025-10-26', 'Diabetes Check', 'Sugar level monitoring and consultation.', 'visit'),
-('TE037', 'P027', '2025-10-25', 'Lab Tests', 'ECG and blood glucose checked.', 'test'),
-('TE038', 'P028', '2025-10-15', 'Chest Congestion', 'Admitted for observation and medication.', 'admission'),
-('TE039', 'P028', '2025-10-17', 'Discharged', 'Condition improved and stable.', 'discharge'),
-('TE040', 'P029', '2025-10-21', 'Skin Consultation', 'Treatment for skin rashes prescribed.', 'visit'),
-('TE041', 'P030', '2025-10-18', 'Vitamin Test', 'Vitamin D and calcium levels checked.', 'test'),
-('TE042', 'P031', '2025-10-09', 'Kidney Stone Admission', 'Admitted for severe kidney pain.', 'admission'),
-('TE043', 'P031', '2025-10-10', 'Surgery', 'Stone removal surgery done.', 'surgery'),
-('TE044', 'P031', '2025-10-13', 'Discharge', 'Discharged after successful surgery.', 'discharge'),
-('TE045', 'P032', '2025-10-25', 'Post-Op Check', 'Follow-up after surgery, healing fine.', 'visit'),
-('TE046', 'P033', '2025-10-24', 'Lipid Test', 'Cholesterol and triglyceride test performed.', 'test'),
-('TE047', 'P034', '2025-10-12', 'High Fever Admission', 'Admitted with body ache and high fever.', 'admission'),
-('TE048', 'P034', '2025-10-14', 'Discharged', 'Recovered and advised rest.', 'discharge'),
-('TE049', 'P035', '2025-10-26', 'Eye Follow-up', 'Follow-up for earlier eye infection.', 'visit'),
-('TE050', 'P036', '2025-10-27', 'Routine Test', 'Blood test and ECG conducted.', 'test');
- 
-
-
-
-INSERT INTO vital_sign_alerts 
-(id, patient_id, type, message, severity, date, resolved)
+-- --------------------------
+-- 9) vital_sign_alerts (some patients with alerts)
+-- --------------------------
+INSERT INTO vital_sign_alerts (id, patient_id, type, message, severity, date, resolved)
 VALUES
-('A001', 'P005', 'Blood Pressure', 'BP exceeded safe range (145/90)', 'High', '2025-09-25', FALSE),
-('A002', 'P007', 'Temperature', 'High temperature detected: 99.3°F', 'Medium', '2025-09-23', TRUE),
-('A003', 'P010', 'Oxygen', 'Oxygen level dropped below 96%', 'High', '2025-09-30', FALSE),
-('A004', 'P002', 'Heart Rate', 'Elevated pulse rate recorded: 88 bpm', 'Low', '2025-09-12', TRUE);
- 
+('A001','P011','Tachycardia','Heart rate >100 bpm on arrival', 'High','2025-11-02', FALSE),
+('A002','P019','Hypoxia','Oxygen saturation dropped to 89%', 'High','2025-11-03', FALSE),
+('A003','P007','Hypertensive','BP 160/100 observed', 'High','2025-10-25', TRUE),
+('A004','P027','Orthopedic','Severe pain after RTA', 'Medium','2025-11-02', FALSE),
+('A005','P036','Neutropenia','Low counts during chemo', 'High','2025-10-28', FALSE);
 
-
-INSERT INTO medications (name)
+-- --------------------------
+-- 10) timeline_events (sample events per some patients)
+-- --------------------------
+INSERT INTO timeline_events (id, patient_id, date, title, description, type)
 VALUES
-('Atorvastatin'),
-('Metformin'),
-('Paracetamol'),
-('Omeprazole'),
-('Amoxicillin'),
-('Losartan'),
-('Insulin'),
-('Cetrizine'),
-('Azithromycin'),
-('Aspirin');
- 
+('T001','P003','2025-10-25','Admitted for MI','Patient admitted with acute MI, stent placed','admission'),
+('T002','P014','2025-10-15','Chemotherapy Cycle 2','Cycle 2 completed, tolerated well','medication'),
+('T003','P011','2025-11-02','ER Admission','Severe multiple trauma from RTA','admission'),
+('T004','P024','2025-08-05','Surgery','Mastectomy performed','surgery'),
+('T005','P008','2025-11-03','ENT Visit','Examined for ear infection','visit');
 
+-- --------------------------
+-- 11) patient_medications (assign meds to many patients)
+-- --------------------------
+INSERT INTO patient_medications (patient_id, medication_id)
+VALUES
+('P001',5),
+('P001',10),
+('P002',1),
+('P003',5),
+('P003',4),
+('P004',1),
+('P006',8),
+('P007',5),
+('P009',9),
+('P010',4),
+('P011',7),
+('P012',6),
+('P013',9),
+('P014',7),
+('P015',3),
+('P016',1),
+('P017',5),
+('P018',2),
+('P019',7),
+('P020',2),
+('P021',5),
+('P022',3),
+('P023',9),
+('P024',7),
+('P025',8),
+('P026',1),
+('P027',7),
+('P028',1),
+('P029',1),
+('P030',1),
+('P031',5),
+('P032',4),
+('P033',9),
+('P034',6),
+('P035',5),
+('P036',7),
+('P037',5),
+('P038',6),
+('P039',9),
+('P040',1),
+('P041',7),
+('P042',4),
+('P043',1),
+('P044',1),
+('P045',2),
+('P046',5),
+('P047',6),
+('P048',3),
+('P049',1),
+('P050',4);
 
+-- --------------------------
+-- 12) patient_allergies (some patients)
+-- --------------------------
+INSERT INTO patient_allergies (patient_id, allergy_id)
+VALUES
+('P002',1),
+('P005',2),
+('P012',6),
+('P020',3),
+('P024',6),
+('P031',1),
+('P033',2),
+('P043',6),
+('P049',6);
+
+-- --------------------------
+-- 13) appointments (about 60 entries)
+-- --------------------------
+INSERT INTO appointments (id, patient_id, staff_id, date, time, department_id, type, status, duration, notes)
+VALUES
+('APPT0001','P002','S001','2025-11-04','09:30:00',1,'Consultation','Scheduled',30,'EKG planned'),
+('APPT0002','P003','S002','2025-11-12','11:00:00',1,'Follow-up','Scheduled',30,'Stent check'),
+('APPT0003','P004','S006','2025-11-15','10:00:00',4,'Consultation','Scheduled',20,'General pediatric visit'),
+('APPT0004','P008','S006','2025-11-10','14:00:00',4,'ENT Visit','Scheduled',20,'Ear check'),
+('APPT0005','P009','S003','2025-11-20','09:00:00',2,'Physio','Scheduled',45,'Knee rehab'),
+('APPT0006','P010','S007','2025-11-25','08:30:00',5,'Lab','Scheduled',15,'HbA1c'),
+('APPT0007','P011','S008','2025-11-10','02:00:00',6,'ER Follow-up','Scheduled',60,'ICU review'),
+('APPT0008','P014','S009','2025-11-20','09:00:00',7,'Chemo','Scheduled',180,'Cycle 3'),
+('APPT0009','P017','S001','2025-11-30','15:00:00',1,'Holter','Scheduled',1440,'24hr Holter'),
+('APPT0010','P019','S005','2025-11-20','10:00:00',6,'Neuro','Scheduled',30,'CT scan planned'),
+('APPT0011','P023','S004','2025-11-29','13:00:00',2,'Injection','Scheduled',15,'Corticosteroid'),
+('APPT0012','P025','S020','2025-11-25','11:00:00',2,'Physio','Scheduled',45,'ACL rehab'),
+('APPT0013','P027','S003','2025-11-18','12:00:00',6,'Surgery Follow-up','Scheduled',30,'RTA injuries'),
+('APPT0014','P028','S010','2025-11-25','09:30:00',8,'ENT Follow-up','Scheduled',20,'Tonsillitis'),
+('APPT0015','P029','S002','2025-11-02','08:00:00',1,'Cardio','Completed',60,'Stent recovery'),
+('APPT0016','P030','S006','2025-11-21','10:30:00',4,'Pediatrics','Scheduled',20,'Check-up'),
+('APPT0017','P032','S018','2025-11-30','09:30:00',5,'GI','Scheduled',30,'Colonoscopy prep'),
+('APPT0018','P033','S004','2025-11-20','14:00:00',2,'Ortho','Scheduled',30,'Ankle rehab'),
+('APPT0019','P034','S010','2025-11-10','15:00:00',8,'ENT','Scheduled',20,'Tonsil follow-up'),
+('APPT0020','P036','S009','2025-11-24','08:00:00',7,'Oncology','Scheduled',180,'Chemo session'),
+('APPT0021','P039','S003','2025-11-20','13:00:00',2,'Orthopedics','Scheduled',30,'Fracture check'),
+('APPT0022','P041','S008','2025-11-19','11:00:00',6,'Trauma','Scheduled',60,'Surgical consult'),
+('APPT0023','P043','S006','2025-11-10','10:00:00',4,'Pediatric','Scheduled',20,'Infant check'),
+('APPT0024','P048','S003','2025-11-03','07:30:00',2,'Surgery','Scheduled',120,'ACL repair'),
+('APPT0025','P050','S022','2025-11-05','09:30:00',5,'Follow-up','Scheduled',30,'BP and sugar'),
+('APPT0026','P001','S007','2025-11-10','10:00:00',5,'Cardio','Scheduled',30,'BP control'),
+('APPT0027','P005','S022','2025-11-10','12:00:00',5,'Gastro','Scheduled',30,'Ulcer follow-up'),
+('APPT0028','P012','S010','2025-11-20','09:00:00',8,'ENT','Scheduled',20,'Ear check'),
+('APPT0029','P015','S005','2025-11-11','11:00:00',3,'Neuro','Scheduled',40,'Migraine clinic'),
+('APPT0030','P016','S022','2025-12-01','10:00:00',5,'Medicine','Scheduled',20,'General follow-up'),
+('APPT0031','P018','S003','2025-11-02','10:30:00',2,'Op Follow-up','Completed',30,'Cast removal'),
+('APPT0032','P021','S007','2025-11-06','09:30:00',5,'Cardio','Completed',30,'BP meds'),
+('APPT0033','P022','S005','2025-11-19','10:00:00',3,'Neuro','Scheduled',30,'Cognitive test'),
+('APPT0034','P026','S022','2025-11-14','09:00:00',5,'Surgery','Scheduled',60,'Gallstone follow-up'),
+('APPT0035','P035','S022','2025-11-11','14:00:00',5,'Medicine','Scheduled',30,'Liver tests'),
+('APPT0036','P037','S001','2025-11-07','08:00:00',1,'Cardio','Completed',30,'BP control'),
+('APPT0037','P038','S010','2025-11-10','09:30:00',8,'ENT','Scheduled',20,'Sinusitis'),
+('APPT0038','P040','S006','2025-11-30','10:00:00',4,'Pediatrics','Scheduled',20,'Skin check'),
+('APPT0039','P042','S022','2025-11-17','09:00:00',5,'Endocrine','Scheduled',30,'Thyroid test'),
+('APPT0040','P044','S024','2025-11-12','08:30:00',1,'Cardio','Completed',30,'Stress test'),
+('APPT0041','P045','S022','2025-11-01','10:00:00',5,'Urology','Completed',20,'UTI follow-up'),
+('APPT0042','P046','S005','2025-11-30','09:00:00',3,'Neuro Rehab','Scheduled',60,'Stroke rehab'),
+('APPT0043','P047','S010','2025-11-13','08:30:00',8,'ENT','Completed',20,'Vertigo'),
+('APPT0044','P049','S022','2025-10-20','10:00:00',5,'Gastro','Completed',30,'IBS review'),
+('APPT0045','P028','S010','2025-11-25','09:30:00',8,'ENT','Completed',20,'Tonsillitis'),
+('APPT0046','P024','S009','2026-01-05','10:00:00',7,'Oncology','Scheduled',120,'Imaging'),
+('APPT0047','P032','S018','2025-11-30','09:30:00',5,'GI','Scheduled',40,'Colon prep'),
+('APPT0048','P013','S029','2025-11-05','15:00:00',5,'Surgical','Completed',60,'Post-op'),
+('APPT0049','P034','S010','2025-11-10','15:30:00',8,'ENT','Scheduled',20,'Tonsil follow-up'),
+('APPT0050','P031','S005','2025-11-22','09:30:00',3,'Neurology','Scheduled',40,'Parkinsons review'),
+('APPT0051','P001','S007','2025-11-10','11:00:00',5,'Cardio','Scheduled',30,'BP check'),
+('APPT0052','P002','S001','2025-11-04','10:00:00',1,'Cardio','Scheduled',30,'EKG review'),
+('APPT0053','P048','S003','2025-11-03','08:00:00',2,'Surgery','Scheduled',120,'ACL surgery'),
+('APPT0054','P027','S020','2025-11-17','16:00:00',2,'Physio','Scheduled',45,'PT session'),
+('APPT0055','P039','S003','2025-11-20','13:30:00',2,'Ortho','Scheduled',30,'Fracture follow-up'),
+('APPT0056','P050','S022','2025-11-05','10:30:00',5,'Medicine','Scheduled',30,'Diabetes counselling'),
+('APPT0057','P021','S007','2025-11-06','10:00:00',5,'Cardio','Completed',30,'BP meds adjusted'),
+('APPT0058','P015','S005','2025-11-11','11:30:00',3,'Neurology','Scheduled',30,'Migraine review'),
+('APPT0059','P003','S002','2025-11-12','11:30:00',1,'Cardio','Scheduled',30,'Follow-up'),
+('APPT0060','P020','S006','2025-12-15','09:00:00',4,'ENT','Scheduled',20,'Seasonal allergy');
+
+-- --------------------------
+-- 14) staff_schedule (sample entries)
+-- --------------------------
+INSERT INTO staff_schedule (staff_id, date, shift)
+VALUES
+('S001','2025-11-03','Morning'),
+('S002','2025-11-03','Evening'),
+('S003','2025-11-03','Morning'),
+('S004','2025-11-03','Night'),
+('S005','2025-11-03','Morning'),
+('S006','2025-11-03','Morning'),
+('S007','2025-11-03','Evening'),
+('S008','2025-11-03','Night'),
+('S009','2025-11-03','Morning'),
+('S010','2025-11-03','Morning');
+
+-- --------------------------
+-- 15) financial_monthly (6 months sample)
+-- --------------------------
 INSERT INTO financial_monthly (month, revenue, expenses, profit, patients)
 VALUES
-('August 2025', 9500000.00, 7200000.00, 2300000.00, 1200),
-('September 2025', 10400000.00, 7600000.00, 2800000.00, 1380),
-('October 2025', 11500000.00,  8000000.00, 3500000.00, 1450);
- 
+('June 2025', 4200000.00, 2500000.00, 1700000.00, 5800),
+('July 2025', 4400000.00, 2600000.00, 1800000.00, 6000),
+('August 2025', 4100000.00, 2450000.00, 1650000.00, 5700),
+('September 2025', 4300000.00, 2550000.00, 1750000.00, 5900),
+('October 2025', 4500000.00, 2650000.00, 1850000.00, 6100),
+('November 2025', 2000000.00, 1200000.00, 800000.00, 3000);
 
+-- --------------------------
+-- 16) department_financials (for 8 depts)
+-- --------------------------
+INSERT INTO department_financials (department_id, revenue, percentage)
+VALUES
+(1, 1250000.00, 18.5),
+(2, 980000.00, 14.5),
+(3, 760000.00, 11.3),
+(4, 540000.00, 8.0),
+(5, 2100000.00, 31.0),
+(6, 3200000.00, 47.2),
+(7, 980000.00, 14.5),
+(8, 420000.00, 6.2);
 
+-- --------------------------
+-- 17) payment_methods
+-- --------------------------
+INSERT INTO payment_methods (method, amount, percentage)
+VALUES
+('Cash', 1200000.00, 18.0),
+('Credit Card', 3000000.00, 45.0),
+('Insurance', 2500000.00, 37.0);
+
+-- --------------------------
+-- 18) quality_patient_satisfaction (per department)
+-- --------------------------
 INSERT INTO quality_patient_satisfaction (department_id, score, responses)
 VALUES
-(1, 8.9, 220),
-(2, 8.6, 180),
-(3, 9.0, 200),
-(4, 9.2, 150),
-(5, 8.1, 300),
-(6, 8.7, 140),
-(7, 9.1, 100),
-(8, 8.8, 90),
-(9, 8.4, 120),
-(10, 9.0, 200);
- 
+(1, 4.5, 320),
+(2, 4.3, 250),
+(3, 4.1, 180),
+(4, 4.6, 400),
+(5, 4.2, 800),
+(6, 4.0, 1200),
+(7, 4.0, 130),
+(8, 4.4, 140);
 
-
-
-INSERT INTO overview_statistics
-(date, total_patients, active_patients, new_patients_today, total_appointments, today_appointments, completed_appointments, cancelled_appointments, pending_results, critical_alerts, total_beds, occupied_beds, available_beds, bed_occupancy_rate, total_staff, staff_on_duty, doctors_available, nurses_on_duty, average_wait_time, patient_satisfaction_score, revenue, expenses)
-VALUES
-('2025-10-22', 1420, 1180, 20, 540, 48, 465, 15, 30, 5, 500, 430, 70, 86.00, 260, 210, 85, 95, 22, 8.7, 10200000.00, 7800000.00),
-('2025-10-23', 1445, 1200, 25, 550, 50, 470, 12, 28, 4, 500, 440, 60, 88.00, 260, 215, 88, 96, 21, 8.8, 10350000.00, 7850000.00),
-('2025-10-24', 1468, 1215, 23, 555, 52, 475, 10, 26, 3, 500, 442, 58, 88.40, 260, 216, 90, 95, 20, 8.9, 10420000.00, 7860000.00),
-('2025-10-25', 1485, 1230, 20, 560, 53, 480, 8, 25, 2, 500, 445, 55, 89.00, 260, 218, 90, 96, 19, 9.0, 10500000.00, 7880000.00),
-('2025-10-26', 1500, 1245, 22, 570, 55, 490, 9, 24, 3, 500, 450, 50, 90.00, 260, 220, 92, 97, 18, 9.0, 10600000.00, 7895000.00),
-('2025-10-27', 1515, 1258, 18, 575, 54, 492, 8, 22, 2, 500, 455, 45, 91.00, 260, 221, 94, 97, 18, 9.1, 10700000.00, 7900000.00),
-('2025-10-28', 1530, 1270, 17, 578, 55, 495, 6, 20, 2, 500, 458, 42, 91.60, 260, 223, 95, 98, 17, 9.1, 10850000.00, 7910000.00),
-('2025-10-29', 1550, 1285, 20, 580, 56, 498, 5, 19, 1, 500, 460, 40, 92.00, 260, 224, 95, 99, 17, 9.2, 10980000.00, 7925000.00),
-('2025-10-30', 1565, 1300, 18, 585, 58, 500, 4, 18, 1, 500, 462, 38, 92.40, 260, 225, 96, 100, 16, 9.2, 11100000.00, 7930000.00),
-('2025-10-31', 1580, 1310, 15, 590, 60, 505, 3, 16, 1, 500, 465, 35, 93.00, 260, 226, 97, 100, 16, 9.3, 11250000.00, 7950000.00);
- 
-
-INSERT INTO demographics_age (age_group, label, count, percentage, color)
-VALUES
-('0-12', 'Children', 120, 8.0, '#4F46E5'),
-('13-19', 'Teenagers', 150, 10.0, '#06B6D4'),
-('20-35', 'YoungAdults', 400, 26.0, '#10B981'),
-('36-50', 'Adults', 450, 29.0, '#F59E0B'),
-('51-65', 'MiddleAged', 280, 18.0, '#EF4444'),
-('65+', 'Senior Citizens', 160, 9.0, '#8B5CF6');
- 
-
-
-INSERT INTO demographics_gender (gender, count, percentage, color)
-VALUES
-('Male', 850, 55.0, '#3B82F6'),
-('Female', 690, 44.0, '#EC4899'),
-('Other', 10, 1.0, '#FACC15');
- 
-
-INSERT INTO demographics_insurance (type, count, percentage, color)
-VALUES
-('Government', 420, 27.0, '#6366F1'),
-('Private', 760, 49.0, '#10B981'),
-('Corporate', 250, 16.0, '#F59E0B'),
-('Uninsured', 120, 8.0, '#EF4444');
- 
-
-
-INSERT INTO recent_activities (type, message, timestamp, priority)
-VALUES
-('Admission', 'Patient P011 admitted to Cardiology ward', '2025-10-31 09:45:00', 'High'),
-('Surgery', 'Orthopedic surgery successfully completed for P005', '2025-10-31 11:15:00', 'High'),
-('Test Result', 'Blood test reports ready for P010', '2025-10-31 12:10:00', 'Medium'),
-('Appointment', 'New appointment scheduled with Dr. Sharma (Neurology)', '2025-10-31 13:45:00', 'Low'),
-('Discharge', 'Patient P004 discharged after recovery', '2025-10-31 14:00:00', 'Medium'),
-('Medication', 'Pharmacy updated medication list for P002', '2025-10-31 15:20:00', 'Low'),
-('Alert', 'Critical BP alert for Patient P005', '2025-10-31 15:55:00', 'High'),
-('Visit', 'Follow-up consultation completed by P009', '2025-10-31 16:30:00', 'Low'),
-('Staff', 'Dr. Meena (Pediatrics) marked On Leave for next 2 days', '2025-10-31 17:00:00', 'Medium'),
-('System', 'Daily backup completed successfully', '2025-10-31 23:59:00', 'Low');
-
-
-
- INSERT INTO department_financials (department_id, revenue, percentage)
-VALUES
-(1, 3200000.00, 27.50),
-(2, 2500000.00, 21.50),
-(3, 1800000.00, 15.50),
-(4, 1200000.00, 10.30),
-(5, 2100000.00, 17.80),
-(6, 800000.00,  7.40);
- 
-
-
-INSERT INTO quality_patient_satisfaction (department_id, score, responses)
-VALUES
-(1, 9.1, 320),
-(2, 8.7, 290),
-(3, 8.9, 250),
-(4, 9.4, 400),
-(5, 8.6, 220),
-(6, 8.8, 310);
- 
-
+-- --------------------------
+-- 19) quality_wait_times (per dept)
+-- --------------------------
 INSERT INTO quality_wait_times (department_id, avg_wait, target)
 VALUES
-(1, 22, 25),
-(2, 28, 25),
-(3, 24, 25),
-(4, 18, 20),
-(5, 26, 25),
-(6, 20, 20);
- 
+(1, 25, 20),
+(2, 18, 15),
+(3, 30, 25),
+(4, 20, 15),
+(5, 22, 18),
+(6, 10, 10),
+(7, 45, 30),
+(8, 15, 12);
 
-
+-- --------------------------
+-- 20) quality_readmission_rates (per dept)
+-- --------------------------
 INSERT INTO quality_readmission_rates (department_id, rate, target)
 VALUES
-(1, 4.50, 5.00),
-(2, 5.20, 5.00),
-(3, 4.80, 5.00),
-(4, 3.90, 4.50),
-(5, 5.40, 5.00),
-(6, 4.60, .00);
- 
+(1, 5.20, 4.00),
+(2, 3.10, 3.00),
+(3, 4.50, 3.50),
+(4, 2.30, 2.00),
+(5, 6.10, 4.50),
+(6, 8.00, 6.00),
+(7, 7.50, 5.00),
+(8, 2.00, 2.00);
 
+-- --------------------------
+-- 21) overview_statistics (for 2025-11-03)
+-- --------------------------
+INSERT INTO overview_statistics (date, total_patients, active_patients, new_patients_today, total_appointments, today_appointments, completed_appointments, cancelled_appointments, pending_results, critical_alerts, total_beds, occupied_beds, available_beds, bed_occupancy_rate, total_staff, staff_on_duty, doctors_available, nurses_on_duty, average_wait_time, patient_satisfaction_score, revenue, expenses)
+VALUES
+('2025-11-03', 10200, 320, 50, 450, 40, 380, 20, 45, 12, 650, 540, 110, 83.08, 300, 120, 60, 45, 22, 4.3, 4500000.00, 2650000.00);
 
-INSERT INTO staff_schedule (id, staff_id, date, shift, created_at, updated_at) VALUES
--- === 2025-11-01 Schedules ===
-(1, 'STF001', '2025-11-01', 'Morning', NOW(), NOW()),
-(2, 'STF002', '2025-11-01', 'Evening', NOW(), NOW()),
-(3, 'STF003', '2025-11-01', 'Morning', NOW(), NOW()),
-(4, 'STF004', '2025-11-01', 'Night', NOW(), NOW()),
-(5, 'STF005', '2025-11-01', 'Night', NOW(), NOW()),
-(6, 'STF011', '2025-11-01', 'Morning', NOW(), NOW()),
-(7, 'STF012', '2025-11-01', 'Evening', NOW(), NOW()),
-(8, 'STF013', '2025-11-01', 'Morning', NOW(), NOW()),
-(9, 'STF014', '2025-11-01', 'Night', NOW(), NOW()),
-(10, 'STF015', '2025-11-01', 'Morning', NOW(), NOW()),
-(11, 'STF022', '2025-11-01', 'Morning', NOW(), NOW()),
-(12, 'STF023', '2025-11-01', 'Evening', NOW(), NOW()),
-(13, 'STF024', '2025-11-01', 'Morning', NOW(), NOW()),
-(14, 'STF025', '2025-11-01', 'Night', NOW(), NOW()),
-(15, 'STF026', '2025-11-01', 'Morning', NOW(), NOW()),
-(16, 'D101', '2025-11-01', 'Morning', NOW(), NOW()),
-(17, 'D102', '2025-11-01', 'Evening', NOW(), NOW()),
-(18, 'D104', '2025-11-01', 'Night', NOW(), NOW()),
- 
--- === 2025-11-02 Schedules ===
-(19, 'STF006', '2025-11-02', 'Morning', NOW(), NOW()),
-(20, 'STF007', '2025-11-02', 'Evening', NOW(), NOW()),
-(21, 'STF008', '2025-11-02', 'Morning', NOW(), NOW()),
-(22, 'STF009', '2025-11-02', 'Evening', NOW(), NOW()),
-(23, 'STF010', '2025-11-02', 'Night', NOW(), NOW()),
-(24, 'STF016', '2025-11-02', 'Night', NOW(), NOW()),
-(25, 'STF017', '2025-11-02', 'Evening', NOW(), NOW()),
-(26, 'STF018', '2025-11-02', 'Morning', NOW(), NOW()),
-(27, 'STF019', '2025-11-02', 'Morning', NOW(), NOW()),
-(28, 'STF020', '2025-11-02', 'Evening', NOW(), NOW()),
-(29, 'STF027', '2025-11-02', 'Evening', NOW(), NOW()),
-(30, 'STF028', '2025-11-02', 'Morning', NOW(), NOW()),
-(31, 'STF029', '2025-11-02', 'Morning', NOW(), NOW()),
-(32, 'STF030', '2025-11-02', 'Evening', NOW(), NOW()),
-(33, 'STF031', '2025-11-02', 'Evening', NOW(), NOW()),
-(34, 'D105', '2025-11-02', 'Morning', NOW(), NOW()),
-(35, 'D106', '2025-11-02', 'Evening', NOW(), NOW()),
-(36, 'D107', '2025-11-02', 'Night', NOW(), NOW()),
- 
--- === 2025-11-03 Schedules ===
-(37, 'STF032', '2025-11-03', 'Morning', NOW(), NOW()),
-(38, 'STF033', '2025-11-03', 'Night', NOW(), NOW()),
-(39, 'STF034', '2025-11-03', 'Morning', NOW(), NOW()),
-(40, 'STF035', '2025-11-03', 'Morning', NOW(), NOW()),
-(41, 'STF036', '2025-11-03', 'Night', NOW(), NOW()),
-(42, 'STF037', '2025-11-03', 'Morning', NOW(), NOW()),
-(43, 'STF038', '2025-11-03', 'Evening', NOW(), NOW()),
-(44, 'STF039', '2025-11-03', 'Morning', NOW(), NOW()),
-(45, 'STF040', '2025-11-03', 'Evening', NOW(), NOW()),
-(46, 'D108', '2025-11-03', 'Morning', NOW(), NOW()),
-(47, 'D109', '2025-11-03', 'Morning', NOW(), NOW()),
-(48, 'D110', '2025-11-03', 'Morning', NOW(), NOW());
- 
+-- --------------------------
+-- 22) demographics_age (buckets summing to 50 patients)
+-- --------------------------
+INSERT INTO demographics_age (age_group, label, count, percentage, color)
+VALUES
+('0-12','Children',6,12.00,'#FF6384'),
+('13-24','Teen/Young Adult',8,16.00,'#36A2EB'),
+('25-44','Adult',20,40.00,'#FFCE56'),
+('45-64','Middle Age',12,24.00,'#4BC0C0'),
+('65+','Senior',4,8.00,'#9966FF');
 
-INSERT INTO payment_methods (id, method, amount, percentage, created_at) VALUES
-(1, 'Cash', 250000.00, 25.00, NOW()),
-(2, 'CreditCard', 350000.00, 35.00, NOW()),
-(3, 'Insurance', 300000.00, 30.00, NOW()),
-(4, 'UPI/OnlineTransfer', 80000.00, 8.00, NOW()),
-(5, 'Others', 20000.00, 2.00, NOW());
+-- --------------------------
+-- 23) demographics_gender (summing to 50)
+-- --------------------------
+INSERT INTO demographics_gender (gender, count, percentage, color)
+VALUES
+('Male',28,56.00,'#36A2EB'),
+('Female',22,44.00,'#FF6384');
+
+-- --------------------------
+-- 24) demographics_insurance (summing to 50)
+-- --------------------------
+INSERT INTO demographics_insurance (type, count, percentage, color)
+VALUES
+('Star Health',20,40.00,'#4BC0C0'),
+('ICICI Lombard',8,16.00,'#FFCE56'),
+('HDFC ERGO',7,14.00,'#9966FF'),
+('Apollo Munich',3,6.00,'#36A2EB'),
+('Bajaj Allianz',4,8.00,'#FF6384'),
+('National Insurance',5,10.00,'#C9CBCF');
+
+-- --------------------------
+-- 25) recent_activities (sample)
+-- --------------------------
+INSERT INTO recent_activities (type, message, timestamp, priority)
+VALUES
+('Admission','P011 admitted with multiple trauma','2025-11-02 14:22:00','High'),
+('Alert','P019 oxygen saturation low','2025-11-03 09:10:00','High'),
+('Discharge','P005 discharged after recovery','2025-10-05 11:00:00','Medium'),
+('Appointment','P002 scheduled EKG on 2025-11-04','2025-11-03 10:00:00','Low'),
+('Medication','P014 chemo cycle completed','2025-10-15 17:00:00','Medium');
+
+SET FOREIGN_KEY_CHECKS = 1;
