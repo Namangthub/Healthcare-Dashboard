@@ -1,8 +1,9 @@
-const db = require('../config/db');
+// src/controllers/qualityController.js
+import db from '../config/db.js';
 
-const QualityController = {
-  // Get all quality metrics
-  getQualityMetrics: (req, res) => {
+export const QualityController = {
+  // ✅ Get all quality metrics
+  getQualityMetrics: async (req, res) => {
     const query = `
       SELECT 
         department_name AS departmentName,
@@ -16,17 +17,20 @@ const QualityController = {
       ORDER BY id
     `;
 
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching quality metrics:', err);
-        return res.status(500).json({ message: 'Failed to fetch quality metrics', error: err.message });
-      }
+    try {
+      const [results] = await db.query(query);
       res.json(results);
-    });
+    } catch (err) {
+      console.error('❌ Error fetching quality metrics:', err);
+      res.status(500).json({ 
+        message: 'Failed to fetch quality metrics', 
+        error: err.message 
+      });
+    }
   },
 
-  // Get quality metrics for a specific department
-  getDepartmentQualityMetrics: (req, res) => {
+  // ✅ Get quality metrics for a specific department
+  getDepartmentQualityMetrics: async (req, res) => {
     const { departmentId } = req.params;
 
     const query = `
@@ -43,14 +47,13 @@ const QualityController = {
       LIMIT 1
     `;
 
-    db.query(query, [departmentId], (err, results) => {
-      if (err) {
-        console.error(`Error fetching quality metrics for department ${departmentId}:`, err);
-        return res.status(500).json({ message: 'Failed to fetch department quality metrics', error: err.message });
-      }
+    try {
+      const [results] = await db.query(query, [departmentId]);
 
       if (!results.length) {
-        return res.status(404).json({ error: `Quality metrics for department ID ${departmentId} not found` });
+        return res.status(404).json({ 
+          error: `Quality metrics for department ID ${departmentId} not found` 
+        });
       }
 
       const metrics = results[0];
@@ -71,8 +74,12 @@ const QualityController = {
       };
 
       res.json(formattedData);
-    });
+    } catch (err) {
+      console.error(`❌ Error fetching quality metrics for department ${departmentId}:`, err);
+      res.status(500).json({ 
+        message: 'Failed to fetch department quality metrics', 
+        error: err.message 
+      });
+    }
   }
 };
-
-module.exports = QualityController;
