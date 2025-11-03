@@ -2,18 +2,18 @@
     "sqltools.connections": [
         {
             "mysqlOptions": {
-                "authProtocol": "xprotocol",
+                "authProtocol": "default",
                 "enableSsl": "Disabled"
             },
             "ssh": "Disabled",
             "previewLimit": 50,
-            "server": "localhost",
-            "port": 33060,
+            "server": "shinkansen.proxy.rlwy.net  ",
+            "port": 47815,
             "driver": "MySQL",
-            "name": "mysql",
-            "database": "demo",
+            "name": "Railway MySQL",
+            "database": "railway",
             "username": "root",
-            "password": "Naman@123",
+            "password": "syvKRqfeveOoIIAuGGEMUvujgBQmQUkf",
             "connectionTimeout": 30
         }
     ]
