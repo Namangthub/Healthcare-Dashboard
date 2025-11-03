@@ -2,20 +2,19 @@
 import db from '../config/db.js';
 import { maskPII, maskPatientId } from '../utils/privacyUtils.js';
 
-export class PatientModel {
-  // Get all patients
+export default class PatientModel {
+  // ✅ Get all patients
   static async getAllPatients() {
     try {
       const query = `
         SELECT 
           p.*,
-          d.name as department_name,
-          s.full_name as doctor_name
+          d.name AS department_name,
+          s.full_name AS doctor_name
         FROM patients p
         LEFT JOIN departments d ON p.department_id = d.id
         LEFT JOIN staff s ON p.doctor_id = s.id
       `;
-      
       const result = await db.query(query);
       return result.rows;
     } catch (error) {
@@ -24,20 +23,20 @@ export class PatientModel {
     }
   }
 
-  // Get patient by ID - with normalized ID handling
+  // ✅ Get patient by ID (with normalization)
   static async getPatientById(id) {
     try {
       console.log(`Fetching full patient data for ID: ${id}`);
-      
+
       const normalizedId = this.normalizePatientId(id);
       const possibleIds = [id, normalizedId];
-      
+
       for (const patId of possibleIds) {
         const query = `
           SELECT 
             p.*,
-            d.name as department_name,
-            s.full_name as doctor_name,
+            d.name AS department_name,
+            s.full_name AS doctor_name,
             COALESCE(
               json_build_object(
                 'bloodPressure', pv.blood_pressure,
@@ -46,28 +45,28 @@ export class PatientModel {
                 'oxygenSaturation', pv.oxygen_saturation
               ),
               '{}'::json
-            ) as vitals,
+            ) AS vitals,
             COALESCE(
               (SELECT json_agg(m.medication_name) FROM patient_medications m WHERE m.patient_id = p.id),
               '[]'::json
-            ) as medications,
+            ) AS medications,
             COALESCE(
               (SELECT json_agg(a.allergy_name) FROM patient_allergies a WHERE a.patient_id = p.id),
               '[]'::json
-            ) as allergies
+            ) AS allergies
           FROM patients p
           LEFT JOIN departments d ON p.department_id = d.id
           LEFT JOIN staff s ON p.doctor_id = s.id
           LEFT JOIN patient_vitals_current pv ON pv.patient_id = p.id
           WHERE p.id = $1
         `;
-        
+
         const result = await db.query(query, [patId]);
         if (result.rows.length > 0) {
           return result.rows[0];
         }
       }
-      
+
       console.log(`Patient ${id} not found in database, returning sample data`);
       return this.generateSamplePatient(normalizedId);
     } catch (error) {
@@ -75,20 +74,20 @@ export class PatientModel {
       throw error;
     }
   }
-  
-  // Get secure patient by ID (with PII masked)
+
+  // ✅ Get secure patient by ID (masked)
   static async getSecurePatientById(id) {
     try {
       console.log(`Looking up patient with ID: ${id}`);
-      
+
       const query = `
         SELECT 
           p.id,
           p.full_name,
           p.age,
           p.gender,
-          d.name as department_name,
-          s.full_name as doctor_name,
+          d.name AS department_name,
+          s.full_name AS doctor_name,
           p.status,
           p.severity,
           p.admission_date,
@@ -103,7 +102,7 @@ export class PatientModel {
             'heartRate', pv.heart_rate,
             'temperature', pv.temperature,
             'oxygenSaturation', pv.oxygen_saturation
-          ) as vitals
+          ) AS vitals
         FROM patients p
         LEFT JOIN departments d ON p.department_id = d.id
         LEFT JOIN staff s ON p.doctor_id = s.id
@@ -113,21 +112,21 @@ export class PatientModel {
         WHERE p.id = $1
         GROUP BY p.id, d.name, s.full_name, pv.blood_pressure, pv.heart_rate, pv.temperature, pv.oxygen_saturation
       `;
-      
+
       const result = await db.query(query, [id]);
       if (result.rows.length === 0) {
         console.log(`Patient ${id} not found in database`);
         return null;
       }
-      
+
       return result.rows[0];
     } catch (error) {
       console.error(`Error getting secure patient with id ${id}:`, error);
       throw error;
     }
   }
-  
-  // Get all secure patients
+
+  // ✅ Get all secure patients
   static async getAllSecurePatients() {
     try {
       const query = `
@@ -136,8 +135,8 @@ export class PatientModel {
           p.full_name,
           p.age,
           p.gender,
-          d.name as department_name,
-          s.full_name as doctor_name,
+          d.name AS department_name,
+          s.full_name AS doctor_name,
           p.status,
           p.severity,
           p.admission_date,
@@ -150,7 +149,7 @@ export class PatientModel {
             'heartRate', pv.heart_rate,
             'temperature', pv.temperature,
             'oxygenSaturation', pv.oxygen_saturation
-          ) as vitals
+          ) AS vitals
         FROM patients p
         LEFT JOIN departments d ON p.department_id = d.id
         LEFT JOIN staff s ON p.doctor_id = s.id
@@ -165,7 +164,6 @@ export class PatientModel {
           END, 
           p.id ASC
       `;
-      
       const result = await db.query(query);
       return result.rows;
     } catch (error) {
@@ -173,8 +171,8 @@ export class PatientModel {
       throw error;
     }
   }
-  
-  // Normalize patient IDs (P1 → P001)
+
+  // ✅ Normalize patient IDs (P1 → P001)
   static normalizePatientId(id) {
     if (!id) return '';
     if (id.startsWith('P') || id.startsWith('p')) {
@@ -186,65 +184,51 @@ export class PatientModel {
     }
     return id;
   }
-  
-  // Generate sample patient data
+
+  // ✅ Generate sample patient data
   static generateSamplePatient(id) {
     const normalizedId = this.normalizePatientId(id);
-    const idNum = parseInt(normalizedId.substring(1), 10); 
-    
+    const idNum = parseInt(normalizedId.substring(1), 10);
+
     const ageBase = (idNum * 13) % 50;
     const genderOptions = ['Male', 'Female'];
     const genderIndex = idNum % genderOptions.length;
     const statusOptions = ['Active', 'Scheduled', 'Discharged', 'In Treatment'];
-    const statusIndex = idNum % statusOptions.length;
     const severityOptions = ['Low', 'Medium', 'High', 'Critical'];
-    const severityIndex = idNum % severityOptions.length;
-    
-    const departments = [
-      'Cardiology', 'Neurology', 'Orthopedics', 
-      'Pediatrics', 'Emergency', 'Oncology'
-    ];
+
+    const departments = ['Cardiology', 'Neurology', 'Orthopedics', 'Pediatrics', 'Emergency', 'Oncology'];
     const departmentIndex = idNum % departments.length;
-    
-    const firstNameOptions = ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer'];
-    const lastNameOptions = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia'];
-    const firstNameIndex = (idNum * 3) % firstNameOptions.length;
-    const lastNameIndex = (idNum * 7) % lastNameOptions.length;
-    
-    const firstName = firstNameOptions[firstNameIndex];
-    const lastName = lastNameOptions[lastNameIndex];
-    
+
+    const firstNames = ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer'];
+    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia'];
+
+    const firstName = firstNames[(idNum * 3) % firstNames.length];
+    const lastName = lastNames[(idNum * 7) % lastNames.length];
+
     const heartRate = 60 + (idNum % 40);
     const systolic = 110 + (idNum % 30);
     const diastolic = 70 + (idNum % 20);
-    
+
     return {
       id: normalizedId,
-      firstName,
-      lastName,
       fullName: `${firstName} ${lastName}`,
       age: 35 + ageBase,
       gender: genderOptions[genderIndex],
-      dateOfBirth: `${1960 + (idNum % 40)}-${(idNum % 12) + 1}-${(idNum % 28) + 1}`,
-      phone: `(555) ${100 + idNum}-${1000 + (idNum * 3) % 9000}`,
-      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
-      address: `${100 + idNum} Main St, Anytown, USA`,
-      insurance: ['Private', 'Medicare', 'Medicaid'][idNum % 3],
       department: departments[departmentIndex],
-      doctor: `Dr. ${lastNameOptions[(lastNameIndex + 3) % lastNameOptions.length]}`,
-      admissionDate: `2024-${((idNum % 3) + 4).toString().padStart(2, '0')}-${((idNum % 27) + 1).toString().padStart(2, '0')}`,
-      status: statusOptions[statusIndex],
-      severity: severityOptions[severityIndex],
+      doctor: `Dr. ${lastNames[(idNum * 5) % lastNames.length]}`,
+      status: statusOptions[idNum % statusOptions.length],
+      severity: severityOptions[idNum % severityOptions.length],
       room: `${departments[departmentIndex].charAt(0)}-${100 + (idNum % 100)}`,
       diagnosis: `Sample diagnosis for ${normalizedId}`,
       vitals: {
         bloodPressure: `${systolic}/${diastolic}`,
         heartRate,
         temperature: 97.5 + ((idNum * 13) % 30) / 10,
-        oxygenSaturation: 95 + ((idNum * 17) % 5)
+        oxygenSaturation: 95 + ((idNum * 17) % 5),
       },
       medications: [`Medication ${idNum % 10 + 1}`, `Medication ${(idNum * 3) % 10 + 1}`],
-      allergies: idNum % 3 === 0 ? [`Allergy ${idNum % 5 + 1}`] : []
+      allergies: idNum % 3 === 0 ? [`Allergy ${idNum % 5 + 1}`] : [],
     };
   }
 }
+

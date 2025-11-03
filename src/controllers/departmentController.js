@@ -1,4 +1,4 @@
-import DepartmentModel from '../models/departmentModel.js';
+import { DepartmentModel } from '../models/departmentModel.js';
 import db from '../config/db.js';
 import { 
   transformDepartment, 

@@ -1,27 +1,27 @@
 import express from 'express';
-import patientController from '../controllers/patientController.js';
+import PatientController from '../controllers/patientController.js';
 
 const router = express.Router();
 
 // Get patients by department - specific route first
-router.get('/department/:departmentId', patientController.getPatientsByDepartment);
+router.get('/department/:departmentId', PatientController.getPatientsByDepartment);
 
 // Get patient demographics - specific route
-router.get('/demographics', patientController.getDemographics);
+router.get('/demographics', PatientController.getDemographics);
 
 // Get all patients
-router.get('/', patientController.getSecurePatients);
+router.get('/', PatientController.getSecurePatients);
 
 // Get patient with full details
-router.get('/:id/full', patientController.getPatientById);
+router.get('/:id/full', PatientController.getPatientById);
 
 // Get patient timeline
-router.get('/:id/timeline', patientController.getPatientTimeline);
+router.get('/:id/timeline', PatientController.getPatientTimeline);
 
 // Get patient vitals
-router.get('/:id/vitals', patientController.getPatientVitals);
+router.get('/:id/vitals', PatientController.getPatientVitals);
 
 // Get secure patient by id - must come last as it uses the :id parameter
-router.get('/:id', patientController.getSecurePatientById);
+router.get('/:id', PatientController.getSecurePatientById);
 
 export default router;

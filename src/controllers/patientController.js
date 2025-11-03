@@ -3,7 +3,7 @@ import { maskPII, maskPatientId } from '../utils/privacyUtils.js';
 import PatientModel from '../models/patientModel.js';
 import db from '../config/db.js';
 
-export const PatientController = {
+const PatientController = {
   // ✅ Get all patients
   async getAllPatients(req, res) {
     try {
@@ -19,13 +19,6 @@ export const PatientController = {
   async getSecurePatients(req, res) {
     try {
       const patients = await PatientModel.getAllSecurePatients();
-
-      console.log('Raw database patient result:', patients[0] ? {
-        id: patients[0].id,
-        full_name: patients[0].full_name,
-        department_name: patients[0].department_name,
-        doctor_name: patients[0].doctor_name
-      } : 'No patients');
 
       const securePatients = patients.map(patient => {
         const formatDate = (dateStr) => {
@@ -57,13 +50,6 @@ export const PatientController = {
           medications: patient.medications ? patient.medications.length : 0
         };
       });
-
-      console.log('Transformed patient result:', securePatients[0] ? {
-        id: securePatients[0].id,
-        fullName: securePatients[0].fullName,
-        department: securePatients[0].department,
-        doctor: securePatients[0].doctor
-      } : 'No patients');
 
       res.json(securePatients);
     } catch (error) {
@@ -129,9 +115,8 @@ export const PatientController = {
   async getSecurePatientById(req, res) {
     try {
       const { id } = req.params;
-      console.log(`Looking up patient with ID: ${id}`);
-
       const patient = await PatientModel.getSecurePatientById(id);
+
       if (!patient) {
         return res.status(404).json({ message: `Patient with id ${id} not found` });
       }
@@ -145,23 +130,15 @@ export const PatientController = {
         doctor: maskPII(patient.doctor_name) || 'Unassigned',
         status: patient.status,
         severity: patient.severity,
-        admissionDate: patient.admission_date || patient.admissiondate,
-        lastVisit: patient.last_visit || patient.lastvisit,
-        nextAppointment: patient.next_appointment || patient.nextappointment || 'TBD',
+        admissionDate: patient.admission_date,
+        lastVisit: patient.last_visit,
+        nextAppointment: patient.next_appointment || 'TBD',
         room: patient.room || '---',
         diagnosis: patient.diagnosis || 'Unknown',
         vitals: patient.vitals || {},
         allergies: patient.allergies || [],
         medications: patient.medications || []
       };
-
-      console.log(`Fetched secure patient ${id}:`, {
-        id: securePatient.id,
-        fullName: securePatient.fullName,
-        department: securePatient.department,
-        allergies: securePatient.allergies.length,
-        medications: securePatient.medications.length
-      });
 
       res.json(securePatient);
     } catch (error) {
@@ -187,22 +164,16 @@ export const PatientController = {
     try {
       const demographics = {
         byAge: [
-          { ageGroup: '0-17', label: '0-17', count: 120, percentage: 12, color: '#4285F4' },
-          { ageGroup: '18-34', label: '18-34', count: 210, percentage: 21, color: '#34A853' },
-          { ageGroup: '35-50', label: '35-50', count: 335, percentage: 33.5, color: '#FBBC05' },
-          { ageGroup: '51-65', label: '51-65', count: 180, percentage: 18, color: '#EA4335' },
-          { ageGroup: '65+', label: '65+', count: 155, percentage: 15.5, color: '#FF6D01' }
+          { ageGroup: '0-17', count: 120 },
+          { ageGroup: '18-34', count: 210 },
+          { ageGroup: '35-50', count: 335 },
+          { ageGroup: '51-65', count: 180 },
+          { ageGroup: '65+', count: 155 }
         ],
         byGender: [
-          { gender: 'Male', count: 480, percentage: 48, color: '#4285F4' },
-          { gender: 'Female', count: 515, percentage: 51.5, color: '#34A853' },
-          { gender: 'Other', count: 5, percentage: 0.5, color: '#FBBC05' }
-        ],
-        byInsurance: [
-          { type: 'Private', count: 450, percentage: 45, color: '#4285F4' },
-          { type: 'Medicare', count: 280, percentage: 28, color: '#34A853' },
-          { type: 'Medicaid', count: 180, percentage: 18, color: '#FBBC05' },
-          { type: 'Uninsured', count: 90, percentage: 9, color: '#EA4335' }
+          { gender: 'Male', count: 480 },
+          { gender: 'Female', count: 515 },
+          { gender: 'Other', count: 5 }
         ]
       };
 
@@ -217,50 +188,33 @@ export const PatientController = {
   async getPatientTimeline(req, res) {
     try {
       const { id } = req.params;
-      console.log(`Fetching timeline for patient ${id}`);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      const lastWeek = new Date(today);
+      lastWeek.setDate(today.getDate() - 7);
 
-      let timelineEvents = [];
+      const timelineEvents = [
+        {
+          id: `${id}-1`,
+          date: yesterday.toISOString().split('T')[0],
+          type: 'visit',
+          title: 'Doctor Visit',
+          description: 'Routine check-up'
+        },
+        {
+          id: `${id}-2`,
+          date: lastWeek.toISOString().split('T')[0],
+          type: 'test',
+          title: 'Blood Test',
+          description: 'Routine lab test'
+        }
+      ];
 
-      try {
-        // Example placeholder: replace with actual DB call later
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const lastWeek = new Date(today);
-        lastWeek.setDate(lastWeek.getDate() - 7);
-
-        timelineEvents = [
-          {
-            id: `${id}-timeline-1`,
-            date: yesterday.toISOString().split('T')[0],
-            type: 'visit',
-            title: 'Doctor Visit',
-            description: 'Regular check-up with Dr. Smith'
-          },
-          {
-            id: `${id}-timeline-2`,
-            date: lastWeek.toISOString().split('T')[0],
-            type: 'test',
-            title: 'Blood Test',
-            description: 'Routine blood work completed'
-          },
-          {
-            id: `${id}-timeline-3`,
-            date: '2024-06-01',
-            type: 'admission',
-            title: 'Hospital Admission',
-            description: 'Admitted for observation'
-          }
-        ];
-      } catch (dbError) {
-        console.error(`Database error fetching timeline for patient ${id}:`, dbError);
-      }
-
-      console.log(`Returning ${timelineEvents.length} timeline events for patient ${id}`);
       res.json(timelineEvents);
     } catch (error) {
       console.error(`Error fetching timeline for patient ${req.params.id}:`, error);
-      res.status(500).json({ message: 'Failed to fetch patient timeline' });
+      res.status(500).json({ message: 'Failed to fetch timeline' });
     }
   },
 

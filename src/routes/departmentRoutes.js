@@ -1,6 +1,6 @@
 // src/routes/departmentRoutes.js
 import express from 'express';
-import DepartmentController from '../controllers/departmentController.js';
+import { DepartmentController } from '../controllers/departmentController.js';
 import OverviewController from '../controllers/overviewController.js';
 
 const router = express.Router();
