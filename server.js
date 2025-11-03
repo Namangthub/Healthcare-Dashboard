@@ -2,21 +2,23 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import db from './config/db.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import db from './src/config/db.js';
+import { errorHandler } from './src/middleware/errorHandler.js';
+
 
 // Import route files
-import departmentRoutes from './routes/departmentRoutes.js';
-import patientRoutes from './routes/patientRoutes.js';
-import staffRoutes from './routes/staffRoutes.js';
-import qualityRoutes from './routes/qualityRoutes.js';
-import financialRoutes from './routes/financialRoutes.js';
-import vitalSignsRoutes from './routes/vitalSignsRoutes.js';
-import appointmentRoutes from './routes/appointmentRoutes.js';
-import inventoryRoutes from './routes/inventoryRoutes.js';
-import overviewRoutes from './routes/overviewRoutes.js';
-import demographicsRoutes from './routes/demographicsRoutes.js';
-import activitiesRoutes from './routes/activitiesRoutes.js';
+import departmentRoutes from './src/routes/departmentRoutes.js';
+import patientRoutes from './src/routes/patientRoutes.js';
+import staffRoutes from './src/routes/staffRoutes.js';
+import qualityRoutes from './src/routes/qualityRoutes.js';
+import financialRoutes from './src/routes/financialRoutes.js';
+import vitalSignsRoutes from './src/routes/vitalSignsRoutes.js';
+import appointmentRoutes from './src/routes/appointmentRoutes.js';
+import inventoryRoutes from './src/routes/inventoryRoutes.js';
+import overviewRoutes from './src/routes/overviewRoutes.js';
+import demographicsRoutes from './src/routes/demographicsRoutes.js';
+import activitiesRoutes from './src/routes/activitiesRoutes.js';
+
 
 // Initialize environment variables
 dotenv.config();
