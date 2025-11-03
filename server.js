@@ -1,11 +1,11 @@
 // src/server.js
 import express from 'express';
 import cors from 'cors';
-import env from './config/env.js';
+import dotenv from 'dotenv';
 import db from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-// Import routes
+// Import route files
 import departmentRoutes from './routes/departmentRoutes.js';
 import patientRoutes from './routes/patientRoutes.js';
 import staffRoutes from './routes/staffRoutes.js';
@@ -18,10 +18,13 @@ import overviewRoutes from './routes/overviewRoutes.js';
 import demographicsRoutes from './routes/demographicsRoutes.js';
 import activitiesRoutes from './routes/activitiesRoutes.js';
 
-// Initialize express app
+// Initialize environment variables
+dotenv.config();
+
+// Create express app
 const app = express();
 
-// Middlewares
+// Global middlewares
 app.use(cors());
 app.use(express.json());
 
@@ -34,7 +37,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API routes
+// Mount all routes
 app.use('/api/departments', departmentRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/staff', staffRoutes);
@@ -47,16 +50,20 @@ app.use('/api/overview', overviewRoutes);
 app.use('/api/demographics', demographicsRoutes);
 app.use('/api/activities', activitiesRoutes);
 
-// Error handling
+// Centralized error handler
 app.use(errorHandler);
 
-// Start the server
-const PORT = env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  db.testConnection()
-    .then(() => console.log(`Database connected: ${new Date().toISOString()}`))
-    .catch(err => console.error('Database connection error:', err));
+// Start server
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, async () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  try {
+    await db.testConnection();
+    console.log(`✅ Database connected successfully at ${new Date().toISOString()}`);
+  } catch (error) {
+    console.error('❌ Database connection error:', error.message);
+  }
 });
 
 export default app;
