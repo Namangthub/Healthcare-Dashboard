@@ -1,4 +1,3 @@
-// src/models/departmentModel.js
 import db from '../config/db.js';
 
 export const DepartmentModel = {
@@ -109,5 +108,31 @@ export const DepartmentModel = {
     } catch (error) {
       throw new Error(`Error getting department patient count: ${error.message}`);
     }
+  },
+
+  // 🆕 Get appointments for a department
+getDepartmentAppointments: async (id) => {
+  try {
+    const query = `
+      SELECT 
+        a.id, 
+        a.patient_id, 
+        a.doctor_, 
+        a.department_id, 
+        a.date AS appointment_date, 
+        a.status,
+        p.full_name AS patient_name, 
+        s.full_name AS doctor_name
+      FROM appointments a
+      LEFT JOIN patients p ON a.patient_id = p.id
+      LEFT JOIN staff s ON a.staff_id = s.id
+      WHERE a.department_id = ?
+      ORDER BY a.date DESC;
+    `;
+    const [rows] = await db.query(query, [id]);
+    return rows;
+  } catch (error) {
+    throw new Error(`Error getting department appointments: ${error.message}`);
   }
+}
 };

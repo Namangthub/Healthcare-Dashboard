@@ -1,4 +1,3 @@
-// src/routes/departmentRoutes.js
 import express from 'express';
 import { DepartmentController } from '../controllers/departmentController.js';
 import OverviewController from '../controllers/overviewController.js';
@@ -22,5 +21,8 @@ router.get('/:id/staff', DepartmentController.getDepartmentStaff);
 
 // Get patients in a department
 router.get('/:id/patients', DepartmentController.getDepartmentPatients);
+
+// 🆕 Get appointments in a department
+router.get('/:id/appointments', DepartmentController.getDepartmentAppointments);
 
 export default router;
