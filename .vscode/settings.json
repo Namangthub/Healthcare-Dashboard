@@ -15,6 +15,22 @@
             "username": "root",
             "password": "Naman@123",
             "connectionTimeout": 30
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "shinkansen.proxy.rlwy.net",
+            "port": 47815,
+            "driver": "MySQL",
+            "name": "Railway MySQL",
+            "database": "railway",
+            "username": "root",
+            "password": "syvKRqfeveOoIIAuGGEMUvujgBQmQUkf",
+            "connectionTimeout": 30
         }
     ]
 }
