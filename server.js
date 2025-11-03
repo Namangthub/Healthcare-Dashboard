@@ -1,22 +1,22 @@
-// src/app.js
-const express = require('express');
-const cors = require('cors');
-const env = require('./config/env');
-const db = require('./config/db');
-const errorHandler = require('./middleware/errorHandler');
+// src/server.js
+import express from 'express';
+import cors from 'cors';
+import env from './config/env.js';
+import db from './config/db.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 // Import routes
-const departmentRoutes = require('./routes/departmentRoutes');
-const patientRoutes = require('./routes/patientRoutes');
-const staffRoutes = require('./routes/staffRoutes');
-const qualityRoutes = require('./routes/qualityRoutes');
-const financialRoutes = require('./routes/financialRoutes');
-const vitalSignsRoutes = require('./routes/vitalSignsRoutes');
-const appointmentRoutes = require('./routes/appointmentRoutes');
-const inventoryRoutes = require('./routes/inventoryRoutes');
-const overviewRoutes = require('./routes/overviewRoutes');
-const demographicsRoutes = require('./routes/demographicsRoutes');
-const activitiesRoutes = require('./routes/activitiesRoutes');
+import departmentRoutes from './routes/departmentRoutes.js';
+import patientRoutes from './routes/patientRoutes.js';
+import staffRoutes from './routes/staffRoutes.js';
+import qualityRoutes from './routes/qualityRoutes.js';
+import financialRoutes from './routes/financialRoutes.js';
+import vitalSignsRoutes from './routes/vitalSignsRoutes.js';
+import appointmentRoutes from './routes/appointmentRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
+import overviewRoutes from './routes/overviewRoutes.js';
+import demographicsRoutes from './routes/demographicsRoutes.js';
+import activitiesRoutes from './routes/activitiesRoutes.js';
 
 // Initialize express app
 const app = express();
@@ -47,8 +47,6 @@ app.use('/api/overview', overviewRoutes);
 app.use('/api/demographics', demographicsRoutes);
 app.use('/api/activities', activitiesRoutes);
 
-
-
 // Error handling
 app.use(errorHandler);
 
@@ -61,4 +59,4 @@ app.listen(PORT, () => {
     .catch(err => console.error('Database connection error:', err));
 });
 
-module.exports = app;
+export default app;
