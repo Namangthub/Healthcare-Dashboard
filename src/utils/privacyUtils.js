@@ -8,13 +8,12 @@ export function maskPII(name = '') {
   const parts = name.split(' ');
   return parts.map(p => p[0] + '*'.repeat(Math.max(p.length - 1, 0))).join(' ');
 }
+
 // Mask a patient ID
 export const maskPatientId = (id) => {
   if (!id) return '';
-  
   const prefix = id.substring(0, 2);
   const masked = '*'.repeat(id.length - 2);
-  
   return prefix + masked;
 };
 
@@ -25,6 +24,7 @@ export function maskEmail(email = '') {
   const maskedUser = user[0] + '*'.repeat(Math.max(user.length - 2, 0)) + user.slice(-1);
   return `${maskedUser}@${domain}`;
 }
+
 // ✅ Mask phone numbers
 export function maskPhoneNumber(phone = '') {
   if (!phone) return '';
@@ -33,6 +33,9 @@ export function maskPhoneNumber(phone = '') {
   const visible = cleaned.slice(-4);
   return `***-***-${visible}`;
 }
+
+// Optional alias if you want to keep maskPhone as a name
+export const maskPhone = maskPhoneNumber;
 
 export default {
   maskPII,
