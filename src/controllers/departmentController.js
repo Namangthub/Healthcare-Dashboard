@@ -1,287 +1,180 @@
-import db from "../config/db.js";
- 
-// ✅ Get all departments
+import DepartmentModel from '../models/departmentModel.js';
+import db from '../config/db.js';
+import { 
+  transformDepartment, 
+  transformQualityMetrics, 
+  transformFinancial 
+} from '../utils/transformData.js';
 
-export const getAllDepartments = (req, res, next) => {
+export const DepartmentController = {
+  // Get all departments
+  async getAllDepartments(req, res) {
+    try {
+      const departments = await DepartmentModel.getAllDepartments();
 
-  const sql = "SELECT * FROM departments ORDER BY department_name ASC";
+      // Transform to match frontend schema using utility
+      const transformedDepartments = departments.map(dept => transformDepartment(dept));
 
-  db.query(sql, (err, result) => {
+      res.json(transformedDepartments);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      res.status(500).json({ 
+        message: 'Failed to fetch departments', 
+        error: error.message 
+      });
+    }
+  },
 
-    if (err) return next(err);
+  // Get department by id
+  async getDepartmentById(req, res) {
+    try {
+      const { id } = req.params;
+      const department = await DepartmentModel.getDepartmentById(id);
 
-    res.json({ success: true, data: result });
+      if (!department) {
+        return res.status(404).json({ message: `Department with id ${id} not found` });
+      }
 
-  });
+      const transformedDepartment = transformDepartment(department);
+      res.json(transformedDepartment);
+    } catch (error) {
+      console.error('Error fetching department:', error);
+      res.status(500).json({ 
+        message: 'Failed to fetch department', 
+        error: error.message 
+      });
+    }
+  },
 
+  // Get enhanced department data
+  async getEnhancedDepartment(req, res) {
+    try {
+      const { id } = req.params;
+      const department = await DepartmentModel.getDepartmentById(id);
+
+      if (!department) {
+        return res.status(404).json({ message: `Department with id ${id} not found` });
+      }
+
+      // Get related data in parallel
+      const [financial, quality] = await Promise.all([
+        DepartmentModel.getDepartmentFinancials(id),
+        DepartmentModel.getDepartmentQualityMetrics(id)
+      ]);
+
+      const enhancedDepartment = {
+        department: transformDepartment(department),
+        financial: transformFinancial(financial),
+        quality: transformQualityMetrics(quality)
+      };
+
+      res.json(enhancedDepartment);
+    } catch (error) {
+      console.error('Error fetching enhanced department:', error);
+      res.status(500).json({ 
+        message: 'Failed to fetch enhanced department', 
+        error: error.message 
+      });
+    }
+  },
+
+  // Get department staff
+  async getDepartmentStaff(req, res) {
+    try {
+      const { id } = req.params;
+
+      const department = await DepartmentModel.getDepartmentById(id);
+      if (!department) {
+        return res.status(404).json({ message: `Department with id ${id} not found` });
+      }
+
+      const query = `
+        SELECT s.id, s.first_name, s.last_name, s.full_name, s.role, 
+               s.status, s.shift, s.specialty, s.experience, s.patients, s.rating
+        FROM staff s
+        WHERE s.department_id = $1
+        ORDER BY s.role, s.last_name
+      `;
+
+      const result = await db.query(query, [id]);
+      const rows = result[0] || result.rows || [];
+
+      // Debug logging (optional)
+      if (rows.length) {
+        console.log('First raw staff row:', rows[0]);
+        console.log('Staff rating type:', typeof rows[0].rating);
+      }
+
+      const staff = rows.map(s => ({
+        id: s.id,
+        firstName: s.first_name,
+        lastName: s.last_name,
+        fullName: s.full_name,
+        role: s.role,
+        status: s.status,
+        shift: s.shift,
+        specialty: s.specialty,
+        experience: Number(s.experience),
+        patients: Number(s.patients || 0),
+        rating: Number(s.rating || 0)
+      }));
+
+      res.json(staff);
+    } catch (error) {
+      console.error('Error fetching department staff:', error);
+      res.status(500).json({ 
+        message: 'Failed to fetch department staff', 
+        error: error.message 
+      });
+    }
+  },
+
+  // Get department patients
+  async getDepartmentPatients(req, res) {
+    try {
+      const { id } = req.params;
+
+      const department = await DepartmentModel.getDepartmentById(id);
+      if (!department) {
+        return res.status(404).json({ message: `Department with id ${id} not found` });
+      }
+
+      const query = `
+        SELECT p.id, p.first_name, p.last_name, p.full_name, 
+               p.status, p.severity, p.diagnosis, p.room,
+               p.admission_date, p.last_visit, p.next_appointment,
+               s.full_name AS doctor_name
+        FROM patients p
+        LEFT JOIN staff s ON p.doctor_id = s.id
+        WHERE p.department_id = $1
+        ORDER BY p.last_name
+      `;
+
+      const result = await db.query(query, [id]);
+      const rows = result[0] || result.rows || [];
+
+      const patients = rows.map(p => ({
+        id: p.id,
+        firstName: p.first_name,
+        lastName: p.last_name,
+        fullName: p.full_name,
+        status: p.status,
+        severity: p.severity,
+        diagnosis: p.diagnosis,
+        room: p.room,
+        admissionDate: p.admission_date,
+        lastVisit: p.last_visit,
+        nextAppointment: p.next_appointment,
+        doctor: p.doctor_name || 'Unassigned'
+      }));
+
+      res.json(patients);
+    } catch (error) {
+      console.error('Error fetching department patients:', error);
+      res.status(500).json({ 
+        message: 'Failed to fetch department patients', 
+        error: error.message 
+      });
+    }
+  }
 };
- 
-// ✅ Get department by ID
-
-export const getDepartmentById = (req, res, next) => {
-
-  const { id } = req.params;
-
-  const sql = "SELECT * FROM departments WHERE department_id = ?";
-
-  db.query(sql, [id], (err, result) => {
-
-    if (err) return next(err);
-
-    if (!result.length) return res.status(404).json({ message: "Department not found" });
-
-    res.json({ success: true, data: result[0] });
-
-  });
-
-};
- 
-// ✅ Get department by Name
-
-export const getDepartmentByName = (req, res, next) => {
-
-  const { name } = req.params;
-
-  const sql = "SELECT * FROM departments WHERE department_name LIKE ?";
-
-  db.query(sql, [`%${name}%`], (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result });
-
-  });
-
-};
- 
-// ✅ Get doctors in a department
-
-export const getDoctorsInDepartment = (req, res, next) => {
-
-  const { id } = req.params;
-
-  const sql = `
-
-    SELECT d.* FROM doctors d
-
-    WHERE d.department_id = ?`;
-
-  db.query(sql, [id], (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result });
-
-  });
-
-};
- 
-// ✅ Get patients in a department (via doctor/appointment relation)
-
-export const getPatientsInDepartment = (req, res, next) => {
-
-  const { id } = req.params;
-
-  const sql = `
-
-    SELECT DISTINCT p.* 
-
-    FROM patients p
-
-    JOIN appointments a ON p.patient_id = a.patient_id
-
-    WHERE a.department_id = ?`;
-
-  db.query(sql, [id], (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result });
-
-  });
-
-};
- 
-// ✅ Get appointments by department
-
-export const getAppointmentsByDepartment = (req, res, next) => {
-
-  const { id } = req.params;
-
-  const sql = `
-
-    SELECT a.* 
-
-    FROM appointments a
-
-    WHERE a.department_id = ?
-
-    ORDER BY a.appointment_date DESC`;
-
-  db.query(sql, [id], (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result });
-
-  });
-
-};
- 
-// ✅ Get active departments (having doctors or appointments)
-
-export const getActiveDepartments = (req, res, next) => {
-
-  const sql = `
-
-    SELECT d.*, COUNT(a.appointment_id) AS total_appointments
-
-    FROM departments d
-
-    LEFT JOIN appointments a ON d.department_id = a.department_id
-
-    GROUP BY d.department_id
-
-    HAVING total_appointments > 0`;
-
-  db.query(sql, (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result });
-
-  });
-
-};
- 
-// ✅ Get department statistics (doctors, patients, appointments)
-
-export const getDepartmentStats = (req, res, next) => {
-
-  const { id } = req.params;
-
-  const sql = `
-
-    SELECT 
-
-      d.department_name,
-
-      COUNT(DISTINCT doc.doctor_id) AS total_doctors,
-
-      COUNT(DISTINCT p.patient_id) AS total_patients,
-
-      COUNT(a.appointment_id) AS total_appointments
-
-    FROM departments d
-
-    LEFT JOIN doctors doc ON d.department_id = doc.department_id
-
-    LEFT JOIN appointments a ON d.department_id = a.department_id
-
-    LEFT JOIN patients p ON a.patient_id = p.patient_id
-
-    WHERE d.department_id = ?`;
-
-  db.query(sql, [id], (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result[0] });
-
-  });
-
-};
- 
-// ✅ Get top departments by appointment count
-
-export const getTopDepartmentsByAppointments = (req, res, next) => {
-
-  const sql = `
-
-    SELECT d.department_name, COUNT(a.appointment_id) AS total_appointments
-
-    FROM departments d
-
-    LEFT JOIN appointments a ON d.department_id = a.department_id
-
-    GROUP BY d.department_id
-
-    ORDER BY total_appointments DESC
-
-    LIMIT 5`;
-
-  db.query(sql, (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result });
-
-  });
-
-};
- 
-// ✅ Get department head (HOD)
-
-export const getDepartmentHead = (req, res, next) => {
-
-  const { id } = req.params;
-
-  const sql = `
-
-    SELECT s.staff_id, s.full_name, s.position
-
-    FROM staff s
-
-    WHERE s.department_id = ? AND s.position LIKE '%Head%'`;
-
-  db.query(sql, [id], (err, result) => {
-
-    if (err) return next(err);
-
-    if (!result.length)
-
-      return res.json({ success: true, message: "No department head assigned yet" });
-
-    res.json({ success: true, data: result[0] });
-
-  });
-
-};
- 
-// ✅ Get department capacity info (beds, staff count, etc.)
-
-export const getDepartmentCapacity = (req, res, next) => {
-
-  const { id } = req.params;
-
-  const sql = `
-
-    SELECT 
-
-      d.department_name,
-
-      d.total_beds,
-
-      COUNT(DISTINCT s.staff_id) AS total_staff,
-
-      COUNT(DISTINCT p.patient_id) AS current_patients
-
-    FROM departments d
-
-    LEFT JOIN staff s ON d.department_id = s.department_id
-
-    LEFT JOIN patients p ON d.department_id = p.department_id
-
-    WHERE d.department_id = ?`;
-
-  db.query(sql, [id], (err, result) => {
-
-    if (err) return next(err);
-
-    res.json({ success: true, data: result[0] });
-
-  });
-
-};
-
- 
