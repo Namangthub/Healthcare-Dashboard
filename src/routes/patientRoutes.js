@@ -3,25 +3,28 @@ import PatientController from '../controllers/patientController.js';
 
 const router = express.Router();
 
-// Get patients by department - specific route first
+// ✅ Get patients by department - specific route first
 router.get('/department/:departmentId', PatientController.getPatientsByDepartment);
 
-// Get patient demographics - specific route
+// ✅ Get patient demographics
 router.get('/demographics', PatientController.getDemographics);
 
-// Get all patients
-router.get('/', PatientController.getSecurePatients);
+// ✅ Get all *active* patients only
+router.get('/active', PatientController.getActivePatients);
 
-// Get patient with full details
+// ✅ Get all patients (includes discharged + active)
+router.get('/', PatientController.getAllPatients);
+
+// ✅ Get patient with full details
 router.get('/:id/full', PatientController.getPatientById);
 
-// Get patient timeline
+// ✅ Get patient timeline
 router.get('/:id/timeline', PatientController.getPatientTimeline);
 
-// Get patient vitals
+// ✅ Get patient vitals
 router.get('/:id/vitals', PatientController.getPatientVitals);
 
-// Get secure patient by id - must come last as it uses the :id parameter
+// ✅ Get secure (masked) patient by id — must come last
 router.get('/:id', PatientController.getSecurePatientById);
 
 export default router;
