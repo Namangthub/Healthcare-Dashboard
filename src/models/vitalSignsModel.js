@@ -1,246 +1,149 @@
 import db from '../config/db.js';
 
-export const VitalSignsModel = {
-  // ✅ Get current vital signs for a patient
+export const VitalsModel = {
+  // ✅ Get all vitals for all patients (overview)
+  async getAllVitals() {
+    const query = `
+      SELECT 
+        p.id AS patientId,
+        p.full_name AS patientName,
+        pvc.blood_pressure AS bloodPressure,
+        pvc.heart_rate AS heartRate,
+        pvc.temperature,
+        pvc.oxygen_saturation AS oxygenSaturation,
+        pvc.weight,
+        pvc.height,
+        pvc.updated_at AS lastUpdated,
+        COALESCE((
+          SELECT COUNT(*) 
+          FROM vital_sign_alerts va 
+          WHERE va.patient_id = p.id AND va.resolved = FALSE
+        ), 0) AS activeAlerts
+      FROM patients p
+      LEFT JOIN patient_vitals_current pvc ON pvc.patient_id = p.id
+      ORDER BY p.id ASC;
+    `;
+    const [rows] = await db.query(query);
+    return rows;
+  },
+
+  // ✅ Get current vitals for a single patient
   async getCurrentVitals(patientId) {
-    try {
-      const query = `
-        SELECT pv.*
-        FROM patient_vitals_current pv
-        WHERE pv.patient_id = ?
-      `;
-      const [result] = await db.query(query, [patientId]);
-      return result[0];
-    } catch (error) {
-      throw new Error(`Error getting patient vitals: ${error.message}`);
-    }
+    const query = `
+      SELECT 
+        patient_id AS patientId,
+        blood_pressure AS bloodPressure,
+        heart_rate AS heartRate,
+        temperature,
+        oxygen_saturation AS oxygenSaturation,
+        weight,
+        height,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+      FROM patient_vitals_current
+      WHERE patient_id = ?
+    `;
+    const [rows] = await db.query(query, [patientId]);
+    return rows[0] || null;
   },
 
-  // ✅ Get historical vital signs for a patient
+  // ✅ Get vitals history for a patient
   async getVitalHistory(patientId) {
-    try {
-      const query = `
-        SELECT 
-          vh.recorded_at AS date,
-          vh.heart_rate AS heartRate,
-          vh.blood_pressure AS bloodPressure,
-          vh.temperature,
-          vh.oxygen_saturation AS oxygenSaturation
-        FROM patient_vitals_history vh
-        WHERE vh.patient_id = ?
-        ORDER BY vh.recorded_at DESC
-      `;
-
-      const [result] = await db.query(query, [patientId]);
-
-      if (result.length === 0) {
-        const currentVitals = await VitalSignsModel.getCurrentVitals(patientId);
-        if (!currentVitals) return [];
-
-        const mockHistory = [];
-        const now = new Date();
-
-        for (let i = 0; i < 6; i++) {
-          const date = new Date(now);
-          date.setDate(date.getDate() - (i * 7));
-
-          const variation = (base, percent) => {
-            const change = base * (Math.random() * percent * 2 - percent);
-            return Math.round((base + change) * 10) / 10;
-          };
-
-          let heartRate, systolic, diastolic;
-
-          if (currentVitals.blood_pressure) {
-            const bpParts = currentVitals.blood_pressure.split('/');
-            if (bpParts.length === 2) {
-              systolic = parseInt(bpParts[0]);
-              diastolic = parseInt(bpParts[1]);
-            }
-          }
-
-          heartRate = currentVitals.heart_rate || 75;
-          systolic = systolic || 120;
-          diastolic = diastolic || 80;
-
-          mockHistory.push({
-            date: date.toISOString().split('T')[0],
-            heartRate: variation(heartRate, 0.05),
-            bloodPressure: `${variation(systolic, 0.03)}/${variation(diastolic, 0.03)}`,
-            temperature: variation(currentVitals.temperature || 98.6, 0.01),
-            oxygenSaturation: variation(currentVitals.oxygen_saturation || 98, 0.02)
-          });
-        }
-
-        return mockHistory;
-      }
-
-      return result;
-    } catch (error) {
-      throw new Error(`Error getting patient vital history: ${error.message}`);
-    }
+    const query = `
+      SELECT 
+        id,
+        patient_id AS patientId,
+        date,
+        heart_rate AS heartRate,
+        blood_pressure AS bloodPressure,
+        temperature,
+        oxygen_saturation AS oxygenSaturation,
+        created_at AS createdAt
+      FROM patient_vital_history
+      WHERE patient_id = ?
+      ORDER BY date DESC
+    `;
+    const [rows] = await db.query(query, [patientId]);
+    return rows;
   },
 
-  // ✅ Get vital signs alerts for a patient
-  async getVitalSignsAlerts(patientId) {
-    try {
-      const query = `
-        SELECT 
-          id,
-          patient_id AS patientId,
-          alert_type AS type,
-          message,
-          severity,
-          created_at AS date,
-          resolved
-        FROM patient_vital_alerts
-        WHERE patient_id = ?
-        ORDER BY created_at DESC
-      `;
-      const [result] = await db.query(query, [patientId]);
-      return result;
-    } catch (error) {
-      throw new Error(`Error getting patient vital alerts: ${error.message}`);
-    }
+  // ✅ Get alerts for a patient
+  async getVitalAlerts(patientId) {
+    const query = `
+      SELECT 
+        id,
+        patient_id AS patientId,
+        type,
+        message,
+        severity,
+        date,
+        resolved,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+      FROM vital_sign_alerts
+      WHERE patient_id = ?
+      ORDER BY created_at DESC
+    `;
+    const [rows] = await db.query(query, [patientId]);
+    return rows;
   },
 
-  // ✅ Record new vital signs
-  async recordVitals(patientId, vitalsData) {
+  // ✅ Record new vitals
+  async recordVitals(patientId, data) {
     const conn = await db.getConnection();
     try {
       await conn.beginTransaction();
 
-      // Try to update current vitals
-      const updateQuery = `
-        UPDATE patient_vitals_current
-        SET 
-          blood_pressure = ?,
-          heart_rate = ?,
-          temperature = ?,
-          oxygen_saturation = ?,
-          updated_at = NOW()
-        WHERE patient_id = ?
-      `;
-      const updateValues = [
-        vitalsData.bloodPressure,
-        vitalsData.heartRate,
-        vitalsData.temperature,
-        vitalsData.oxygenSaturation,
-        patientId
-      ];
-      const [updateResult] = await conn.query(updateQuery, updateValues);
+      const { bloodPressure, heartRate, temperature, oxygenSaturation, weight, height } = data;
 
-      // If no rows updated, insert new record
+      const [updateResult] = await conn.query(
+        `UPDATE patient_vitals_current 
+         SET blood_pressure = ?, heart_rate = ?, temperature = ?, oxygen_saturation = ?, weight = ?, height = ?, updated_at = NOW()
+         WHERE patient_id = ?`,
+        [bloodPressure, heartRate, temperature, oxygenSaturation, weight, height, patientId]
+      );
+
       if (updateResult.affectedRows === 0) {
-        const insertQuery = `
-          INSERT INTO patient_vitals_current
-          (patient_id, blood_pressure, heart_rate, temperature, oxygen_saturation)
-          VALUES (?, ?, ?, ?, ?)
-        `;
-        await conn.query(insertQuery, [
-          patientId,
-          vitalsData.bloodPressure,
-          vitalsData.heartRate,
-          vitalsData.temperature,
-          vitalsData.oxygenSaturation
-        ]);
+        await conn.query(
+          `INSERT INTO patient_vitals_current 
+          (patient_id, blood_pressure, heart_rate, temperature, oxygen_saturation, weight, height)
+          VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [patientId, bloodPressure, heartRate, temperature, oxygenSaturation, weight, height]
+        );
       }
 
-      // Insert into vitals history
-      const historyQuery = `
-        INSERT INTO patient_vitals_history
-        (patient_id, blood_pressure, heart_rate, temperature, oxygen_saturation)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-      await conn.query(historyQuery, [
-        patientId,
-        vitalsData.bloodPressure,
-        vitalsData.heartRate,
-        vitalsData.temperature,
-        vitalsData.oxygenSaturation
-      ]);
-
-      // Check for alerts
-      const { heartRate, bloodPressure, temperature, oxygenSaturation } = vitalsData;
-      let systolic = 0, diastolic = 0;
-
-      if (bloodPressure) {
-        const bpParts = bloodPressure.split('/');
-        if (bpParts.length === 2) {
-          systolic = parseInt(bpParts[0]);
-          diastolic = parseInt(bpParts[1]);
-        }
-      }
-
-      const alerts = [];
-
-      if (heartRate > 100) {
-        alerts.push({ type: 'Heart Rate', message: `Elevated heart rate: ${heartRate} BPM`, severity: 'Medium' });
-      } else if (heartRate < 60) {
-        alerts.push({ type: 'Heart Rate', message: `Low heart rate: ${heartRate} BPM`, severity: 'Medium' });
-      }
-
-      if (systolic > 140 || diastolic > 90) {
-        alerts.push({ type: 'Blood Pressure', message: `Hypertension alert: ${bloodPressure}`, severity: 'High' });
-      }
-
-      if (temperature > 100.4) {
-        alerts.push({ type: 'Temperature', message: `Fever alert: ${temperature}°F`, severity: 'Medium' });
-      }
-
-      if (oxygenSaturation < 95) {
-        alerts.push({ type: 'Oxygen Saturation', message: `Low oxygen saturation: ${oxygenSaturation}%`, severity: 'High' });
-      }
-
-      // Insert alerts
-      for (const alert of alerts) {
-        const alertQuery = `
-          INSERT INTO patient_vital_alerts
-          (patient_id, alert_type, message, severity, resolved)
-          VALUES (?, ?, ?, ?, ?)
-        `;
-        await conn.query(alertQuery, [
-          patientId,
-          alert.type,
-          alert.message,
-          alert.severity,
-          false
-        ]);
-      }
+      await conn.query(
+        `INSERT INTO patient_vital_history 
+         (patient_id, date, heart_rate, blood_pressure, temperature, oxygen_saturation)
+         VALUES (?, CURDATE(), ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE 
+           heart_rate = VALUES(heart_rate),
+           blood_pressure = VALUES(blood_pressure),
+           temperature = VALUES(temperature),
+           oxygen_saturation = VALUES(oxygen_saturation)`,
+        [patientId, heartRate, bloodPressure, temperature, oxygenSaturation]
+      );
 
       await conn.commit();
-
-      return {
-        currentReading: {
-          bloodPressure: vitalsData.bloodPressure,
-          heartRate: vitalsData.heartRate,
-          temperature: vitalsData.temperature,
-          oxygenSaturation: vitalsData.oxygenSaturation
-        },
-        alerts
-      };
+      return { message: 'Vitals recorded successfully' };
     } catch (error) {
       await conn.rollback();
-      throw new Error(`Error recording patient vitals: ${error.message}`);
+      throw new Error(`Error recording vitals: ${error.message}`);
     } finally {
       conn.release();
     }
   },
 
-  // ✅ Resolve a vital signs alert
+  // ✅ Resolve alert
   async resolveAlert(alertId) {
-    try {
-      const query = `
-        UPDATE patient_vital_alerts
-        SET resolved = true
-        WHERE id = ?
-      `;
-      await db.query(query, [alertId]);
+    const query = `
+      UPDATE vital_sign_alerts
+      SET resolved = TRUE, updated_at = NOW()
+      WHERE id = ?
+    `;
+    await db.query(query, [alertId]);
 
-      const [result] = await db.query(`SELECT * FROM patient_vital_alerts WHERE id = ?`, [alertId]);
-      return result[0];
-    } catch (error) {
-      throw new Error(`Error resolving alert: ${error.message}`);
-    }
+    const [rows] = await db.query(`SELECT * FROM vital_sign_alerts WHERE id = ?`, [alertId]);
+    return rows[0];
   }
 };

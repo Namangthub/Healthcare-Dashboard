@@ -1,17 +1,21 @@
 import express from 'express';
-import VitalSignsController from '../controllers/vitalSignsController.js';
+import { VitalsController } from '../controllers/vitalSignsController.js';
 
 const router = express.Router();
 
-// Get all vital signs
-router.get('/', VitalSignsController.getAllVitalSigns);
+// ✅ Get all patients' vitals (root route)
+router.get('/', VitalsController.getAllVitalSigns);
 
-// Get vital signs for a specific patient
-router.get('/patient/:id', VitalSignsController.getPatientVitals);
+// ✅ Get vitals for one patient (current, history, alerts)
+router.get('/patient/:patientId', VitalsController.getPatientVitals);
 
-// Add POST route only if the controller method exists
-// If you need this route, make sure to implement the method in VitalSignsController
-// Otherwise, comment it out or remove it
-// router.post('/', VitalSignsController.createVitalSign);
+// ✅ Record new vitals
+router.post('/record', VitalsController.recordVitals);
+
+// ✅ Get alerts for a patient
+router.get('/alerts/:patientId', VitalsController.getPatientAlerts);
+
+// ✅ Resolve alert
+router.put('/alerts/:alertId/resolve', VitalsController.resolveAlert);
 
 export default router;
