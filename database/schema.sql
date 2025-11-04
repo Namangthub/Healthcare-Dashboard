@@ -368,3 +368,26 @@ CREATE TABLE recent_activities (
   priority VARCHAR(20) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE financial_quarterly (
+  quarertly_id INT AUTO_INCREMENT PRIMARY KEY,
+  quarter VARCHAR(20) NOT NULL,
+  revenue DECIMAL(15,2) NOT NULL,
+  expenses DECIMAL(15,2) NOT NULL,
+  profit DECIMAL(15,2) NOT NULL,
+  patients INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+ 
+ 
+ CREATE TABLE financial_yearly (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  year YEAR NOT NULL,
+  revenue DECIMAL(18,2) NOT NULL,
+  expenses DECIMAL(18,2) NOT NULL,
+  profit DECIMAL(18,2) NOT NULL,
+  patients INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ 
