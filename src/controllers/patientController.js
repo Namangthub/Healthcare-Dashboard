@@ -1,109 +1,160 @@
-// src/controllers/patientController.js
-import { maskPII, maskPatientId } from '../utils/privacyUtils.js';
+// ✅ src/controllers/patientController.js
+import { maskPII } from '../utils/privacyUtils.js';
 import PatientModel from '../models/patientModel.js';
-import db from '../config/db.js';
 
 const PatientController = {
-  // ✅ Get all patients
+  // ✅ Get all patients (unmasked, for internal use)
   async getAllPatients(req, res) {
     try {
       const patients = await PatientModel.getAllPatients();
-      res.json(patients);
+
+      // Format & clean patient data
+      const formattedPatients = patients.map((p) => ({
+        id: p.id,
+        fullName: p.full_name || 'Unknown',
+        age: p.age,
+        gender: p.gender,
+        department: p.department_name || 'Unassigned',
+        doctor: p.doctor_name || 'Unassigned',
+        status: p.status,
+        severity: p.severity,
+        admissionDate: p.admission_date ? new Date(p.admission_date).toISOString().split('T')[0] : null,
+        lastVisit: p.last_visit ? new Date(p.last_visit).toISOString().split('T')[0] : null,
+        nextAppointment: p.next_appointment ? new Date(p.next_appointment).toISOString().split('T')[0] : null,
+        room: p.room || '',
+        diagnosis: p.diagnosis || '',
+        vitals: typeof p.vitals === 'string' ? JSON.parse(p.vitals) : p.vitals || null,
+        allergies: Array.isArray(p.allergies) ? p.allergies.length : 0,
+        medications: Array.isArray(p.medications) ? p.medications.length : 0
+      }));
+
+      res.json(formattedPatients);
     } catch (error) {
-      console.error('Error fetching all patients:', error);
+      console.error('❌ Error fetching all patients:', error);
       res.status(500).json({ message: 'Failed to fetch patients' });
     }
   },
 
-  // ✅ Get secure patients (with PII masked)
-  async getSecurePatients(req, res) {
-    try {
-      const patients = await PatientModel.getAllSecurePatients();
+  // ✅ Get secure patients (masked PII for dashboard)
+ async getSecurePatients(req, res) {
+  try {
+    const patients = await PatientModel.getAllSecurePatients();
+    const isSecure = req.query.secure === 'true'; // Add query toggle
 
-      const securePatients = patients.map(patient => {
-        const formatDate = (dateStr) => {
-          if (!dateStr) return null;
-          try {
-            const date = new Date(dateStr);
-            return isNaN(date.getTime()) ? null : date.toISOString().split('T')[0];
-          } catch {
-            return null;
-          }
-        };
+    const securePatients = patients.map((patient) => {
+      const formatDate = (dateStr) =>
+        dateStr ? new Date(dateStr).toISOString().split('T')[0] : null;
 
-        return {
-          id: patient.id,
-          fullName: patient.full_name ? maskPII(patient.full_name) : 'Unknown',
-          age: patient.age,
-          gender: patient.gender,
-          department: patient.department_name || 'Unassigned',
-          doctor: maskPII(patient.doctor_name) || 'Unassigned',
-          status: patient.status,
-          severity: patient.severity,
-          admissionDate: formatDate(patient.admission_date),
-          lastVisit: formatDate(patient.last_visit),
-          nextAppointment: formatDate(patient.next_appointment),
-          room: patient.room || '',
-          diagnosis: patient.diagnosis || '',
-          vitals: patient.vitals || null,
-          allergies: patient.allergies ? patient.allergies.length : 0,
-          medications: patient.medications ? patient.medications.length : 0
-        };
-      });
+      let vitalsData = null;
+      try {
+        vitalsData =
+          typeof patient.vitals === 'string'
+            ? JSON.parse(patient.vitals)
+            : patient.vitals || null;
+      } catch {
+        vitalsData = null;
+      }
 
-      res.json(securePatients);
-    } catch (error) {
-      console.error('Error fetching secure patients:', error);
-      res.status(500).json({ message: 'Failed to fetch patients' });
-    }
-  },
+      return {
+        id: patient.id,
+        fullName: isSecure
+          ? maskPII(patient.full_name)
+          : patient.full_name || 'Unknown',
+        age: patient.age,
+        gender: patient.gender,
+        department: patient.department_name || 'Unassigned',
+        doctor: isSecure
+          ? maskPII(patient.doctor_name)
+          : patient.doctor_name || 'Unassigned',
+        status: patient.status,
+        severity: patient.severity,
+        admissionDate: formatDate(patient.admission_date),
+        lastVisit: formatDate(patient.last_visit),
+        nextAppointment: formatDate(patient.next_appointment),
+        room: patient.room || '',
+        diagnosis: patient.diagnosis || '',
+        vitals: vitalsData,
+        allergies: Array.isArray(patient.allergies)
+          ? patient.allergies.length
+          : 0,
+        medications: Array.isArray(patient.medications)
+          ? patient.medications.length
+          : 0
+      };
+    });
 
-  // ✅ Get patient by ID
+    res.json(securePatients);
+  } catch (error) {
+    console.error('❌ Error fetching secure patients:', error);
+    res.status(500).json({ message: 'Failed to fetch secure patients' });
+  }
+},
+
+  // ✅ Get patient by ID (unmasked)
   async getPatientById(req, res) {
     try {
       const { id } = req.params;
       const patient = await PatientModel.getPatientById(id);
 
       if (!patient) {
-        return res.status(404).json({ message: `Patient with id ${id} not found` });
+        return res
+          .status(404)
+          .json({ message: `Patient with id ${id} not found` });
       }
 
-      const formattedPatient = {
-        id: patient.id,
-        firstName: patient.firstName || patient.first_name,
-        lastName: patient.lastName || patient.last_name,
-        fullName: patient.fullName || patient.full_name,
-        age: patient.age,
-        gender: patient.gender,
-        dateOfBirth: patient.dateOfBirth || patient.date_of_birth,
-        phone: patient.phone,
-        email: patient.email,
-        address: patient.address,
-        insurance: patient.insurance,
-        emergencyContact: patient.emergencyContact || patient.emergency_contact,
-        department: patient.department || patient.department_name,
-        doctor: patient.doctor || patient.doctor_name,
-        admissionDate: patient.admissionDate || patient.admission_date,
-        status: patient.status,
-        severity: patient.severity,
-        room: patient.room,
-        diagnosis: patient.diagnosis,
-        lastVisit: patient.lastVisit || patient.last_visit,
-        nextAppointment: patient.nextAppointment || patient.next_appointment,
-        vitals: patient.vitals || {
+      // Handle vitals safely
+      let vitalsData = null;
+      try {
+        vitalsData =
+          typeof patient.vitals === 'string'
+            ? JSON.parse(patient.vitals)
+            : patient.vitals || null;
+      } catch {
+        vitalsData = {
           bloodPressure: '120/80',
           heartRate: 75,
           temperature: 98.6,
           oxygenSaturation: 98
-        },
-        medications: patient.medications || [],
-        allergies: patient.allergies || [],
+        };
+      }
+
+      const formattedPatient = {
+        id: patient.id,
+        firstName: patient.first_name || '',
+        lastName: patient.last_name || '',
+        fullName: patient.full_name || 'Unknown',
+        age: patient.age,
+        gender: patient.gender,
+        dateOfBirth: patient.date_of_birth || null,
+        phone: patient.phone,
+        email: patient.email,
+        address: patient.address,
+        insurance: patient.insurance,
+        emergencyContact: patient.emergency_contact,
+        department: patient.department_name || 'Unassigned',
+        doctor: patient.doctor_name || 'Unassigned',
+        admissionDate: patient.admission_date,
+        status: patient.status,
+        severity: patient.severity,
+        room: patient.room,
+        diagnosis: patient.diagnosis,
+        lastVisit: patient.last_visit,
+        nextAppointment: patient.next_appointment,
+        vitals: vitalsData,
+        medications:
+          typeof patient.medications === 'string'
+            ? JSON.parse(patient.medications)
+            : patient.medications || [],
+        allergies:
+          typeof patient.allergies === 'string'
+            ? JSON.parse(patient.allergies)
+            : patient.allergies || [],
         notes: patient.notes
       };
 
       res.json(formattedPatient);
     } catch (error) {
-      console.error(`Error fetching patient ${req.params.id}:`, error);
+      console.error(`❌ Error fetching patient ${req.params.id}:`, error);
       res.status(500).json({
         message: 'Failed to fetch patient',
         error: error.message
@@ -111,14 +162,27 @@ const PatientController = {
     }
   },
 
-  // ✅ Get secure patient by ID
+  // ✅ Get secure (masked) patient by ID
   async getSecurePatientById(req, res) {
     try {
       const { id } = req.params;
       const patient = await PatientModel.getSecurePatientById(id);
 
       if (!patient) {
-        return res.status(404).json({ message: `Patient with id ${id} not found` });
+        return res
+          .status(404)
+          .json({ message: `Patient with id ${id} not found` });
+      }
+
+      // Safe vitals parsing
+      let vitalsData = null;
+      try {
+        vitalsData =
+          typeof patient.vitals === 'string'
+            ? JSON.parse(patient.vitals)
+            : patient.vitals || {};
+      } catch {
+        vitalsData = {};
       }
 
       const securePatient = {
@@ -127,7 +191,9 @@ const PatientController = {
         age: patient.age,
         gender: patient.gender,
         department: patient.department_name || 'Unassigned',
-        doctor: maskPII(patient.doctor_name) || 'Unassigned',
+        doctor: patient.doctor_name
+          ? maskPII(patient.doctor_name)
+          : 'Unassigned',
         status: patient.status,
         severity: patient.severity,
         admissionDate: patient.admission_date,
@@ -135,14 +201,14 @@ const PatientController = {
         nextAppointment: patient.next_appointment || 'TBD',
         room: patient.room || '---',
         diagnosis: patient.diagnosis || 'Unknown',
-        vitals: patient.vitals || {},
+        vitals: vitalsData,
         allergies: patient.allergies || [],
         medications: patient.medications || []
       };
 
       res.json(securePatient);
     } catch (error) {
-      console.error(`Error fetching secure patient ${req.params.id}:`, error);
+      console.error(`❌ Error fetching secure patient ${req.params.id}:`, error);
       res.status(500).json({ message: 'Failed to fetch patient' });
     }
   },
@@ -154,12 +220,15 @@ const PatientController = {
       const patients = await PatientModel.getPatientsByDepartment(departmentId);
       res.json(patients);
     } catch (error) {
-      console.error(`Error fetching patients for department ${req.params.departmentId}:`, error);
+      console.error(
+        `❌ Error fetching patients for department ${req.params.departmentId}:`,
+        error
+      );
       res.status(500).json({ message: 'Failed to fetch patients by department' });
     }
   },
 
-  // ✅ Get patient demographics
+  // ✅ Get demographics summary
   async getDemographics(req, res) {
     try {
       const demographics = {
@@ -176,15 +245,14 @@ const PatientController = {
           { gender: 'Other', count: 5 }
         ]
       };
-
       res.json(demographics);
     } catch (error) {
-      console.error('Error fetching patient demographics:', error);
+      console.error('❌ Error fetching demographics:', error);
       res.status(500).json({ message: 'Failed to fetch demographics' });
     }
   },
 
-  // ✅ Get patient timeline
+  // ✅ Get patient timeline (mock)
   async getPatientTimeline(req, res) {
     try {
       const { id } = req.params;
@@ -213,18 +281,18 @@ const PatientController = {
 
       res.json(timelineEvents);
     } catch (error) {
-      console.error(`Error fetching timeline for patient ${req.params.id}:`, error);
+      console.error(`❌ Error fetching timeline for patient ${req.params.id}:`, error);
       res.status(500).json({ message: 'Failed to fetch timeline' });
     }
   },
 
-  // ✅ Redirect to vitals controller
+  // ✅ Redirect vitals request
   async getPatientVitals(req, res) {
     try {
       const { id } = req.params;
       res.redirect(302, `/api/vitals/patient/${id}`);
     } catch (error) {
-      console.error(`Error redirecting vitals request for patient ${req.params.id}:`, error);
+      console.error(`❌ Error redirecting vitals request for patient ${req.params.id}:`, error);
       res.status(500).json({ message: 'Failed to fetch patient vitals' });
     }
   }
