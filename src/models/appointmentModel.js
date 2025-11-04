@@ -6,7 +6,7 @@ const AppointmentModel = {
   async getAllAppointments() {
     const query = `
       SELECT 
-        a.id,
+        a.appointment_id,
         a.patient_id AS patientId,
         p.full_name AS patientName,
         a.date,
@@ -27,7 +27,7 @@ const AppointmentModel = {
   async getAppointmentsForDay(date) {
     const query = `
       SELECT 
-        a.id,
+        a.appointment_id,
         a.patient_id AS patientId,
         p.full_name AS patientName,
         a.date,
@@ -49,7 +49,7 @@ const AppointmentModel = {
   async getPatientAppointments(patientId) {
     const query = `
       SELECT 
-        a.id,
+        a.appointment_id,
         a.date,
         a.time,
         a.status,

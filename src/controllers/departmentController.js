@@ -120,7 +120,7 @@ export const DepartmentController = {
 
       const query = `
         SELECT 
-          a.id, 
+          a.appointment_id, 
           a.date, 
           a.status,  
           p.full_name AS patient_name, 

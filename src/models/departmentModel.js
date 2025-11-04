@@ -115,7 +115,7 @@ getDepartmentAppointments: async (id) => {
   try {
     const query = `
       SELECT 
-        a.id, 
+        a.appointment_id, 
         a.patient_id, 
         a.doctor_, 
         a.department_id, 
