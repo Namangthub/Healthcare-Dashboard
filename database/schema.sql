@@ -391,3 +391,22 @@ CREATE TABLE financial_quarterly (
 );
 
  
+ DROP TABLE IF EXISTS financial_data;
+
+CREATE TABLE financial_data (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  department_id INT NULL,
+  year INT NOT NULL,
+  month_number INT NULL,
+  month_name VARCHAR(20) NULL,
+  quarter VARCHAR(3) NULL,
+  period_type ENUM('monthly','quarterly','yearly','total_yearly') NOT NULL,
+  revenue DECIMAL(15,2) NOT NULL,
+  expenses DECIMAL(15,2) NOT NULL,
+  profit DECIMAL(15,2) AS (revenue - expenses) STORED,
+  CONSTRAINT fk_department
+    FOREIGN KEY (department_id)
+    REFERENCES departments(id)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
+);
