@@ -14,8 +14,8 @@ const FinancialModel = {
   },
 
   // Get data by department
-  async getByDepartment(department_name) {
-    const [rows] = await db.query('SELECT * FROM financial_data WHERE department_name = ? ORDER BY year DESC, month_number DESC', [department_name]);
+  async getByDepartment(department_id) {
+    const [rows] = await db.query('SELECT * FROM financial_data WHERE department_id = ? ORDER BY year DESC', [department_id]);
     return rows;
   },
 };

@@ -26,15 +26,20 @@ const FinancialController = {
 
   // GET /api/financial/department/:name
   async getByDepartment(req, res) {
-    try {
-      const { name } = req.params;
-      const data = await FinancialModel.getByDepartment(name);
-      res.status(200).json(data);
-    } catch (error) {
-      console.error('Error fetching data by department:', error);
-      res.status(500).json({ message: 'Server error while fetching department data' });
+  try {
+    const { id } = req.params; // Extract department ID
+    const data = await FinancialModel.getByDepartment(id);
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: `No financial data found for department ID ${id}` });
     }
-  },
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error fetching data by department:', error);
+    res.status(500).json({ message: 'Server error while fetching department data' });
+  }
+},
 };
 
 export default FinancialController;
