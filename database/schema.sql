@@ -361,18 +361,18 @@ CREATE TABLE recent_activities (
 
 CREATE TABLE financial_data (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  department_id INT NULL,
+  department_id INT NOT NULL,
   year INT NOT NULL,
-  month_number INT NULL,
-  month_name VARCHAR(20) NULL,
-  quarter VARCHAR(3) NULL,
-  period_type ENUM('monthly','quarterly','yearly','total_yearly') NOT NULL,
+  period_label VARCHAR(30) NOT NULL,
+  quarter VARCHAR(10) NOT NULL,
+  period_type ENUM('monthly', 'quarterly', 'yearly') NOT NULL,
   revenue DECIMAL(15,2) NOT NULL,
   expenses DECIMAL(15,2) NOT NULL,
   profit DECIMAL(15,2) AS (revenue - expenses) STORED,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_department
     FOREIGN KEY (department_id)
-    REFERENCES departments(id)
+    REFERENCES departments(deparmtment_id)
     ON UPDATE CASCADE
-    ON DELETE SET NULL
+    ON DELETE CASCADE
 );
