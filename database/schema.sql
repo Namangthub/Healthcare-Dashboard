@@ -221,20 +221,6 @@ CREATE TABLE staff_schedule (
   UNIQUE(staff_id, date),
   FOREIGN KEY (staff_id) REFERENCES staff(id) ON DELETE CASCADE
 );
-
- 
-
- 
-CREATE TABLE financial_monthly (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  month VARCHAR(20) NOT NULL,
-  revenue DECIMAL(12,2) NOT NULL,
-  expenses DECIMAL(12,2) NOT NULL,
-  profit DECIMAL(12,2) NOT NULL,
-  patients INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
  
 
  
@@ -369,26 +355,6 @@ CREATE TABLE recent_activities (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE financial_quarterly (
-  quarertly_id INT AUTO_INCREMENT PRIMARY KEY,
-  quarter VARCHAR(20) NOT NULL,
-  revenue DECIMAL(15,2) NOT NULL,
-  expenses DECIMAL(15,2) NOT NULL,
-  profit DECIMAL(15,2) NOT NULL,
-  patients INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
- 
- 
- CREATE TABLE financial_yearly (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  year YEAR NOT NULL,
-  revenue DECIMAL(18,2) NOT NULL,
-  expenses DECIMAL(18,2) NOT NULL,
-  profit DECIMAL(18,2) NOT NULL,
-  patients INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
  
  DROP TABLE IF EXISTS financial_data;
