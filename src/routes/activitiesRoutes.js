@@ -4,6 +4,6 @@ import { ActivitiesController } from '../controllers/activitiesController.js';
 const router = express.Router();
 
 // Get recent activities
-router.get('/', ActivitiesController.getRecentActivities);
+router.get('/recent/', ActivitiesController.getRecentActivities);
 
 export default router;
