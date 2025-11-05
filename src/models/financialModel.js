@@ -9,7 +9,7 @@ const FinancialModel = {
 
   // Get data by year
   async getByYear(year) {
-    const [rows] = await db.query('SELECT * FROM financial_data WHERE year = ? ORDER BY month_number', [year]);
+    const [rows] = await db.query('SELECT * FROM financial_data WHERE year = ?', [year]);
     return rows;
   },
 
