@@ -3,7 +3,7 @@ import db from '../config/db.js';
 const FinancialModel = {
   // Get all records
   async getAll() {
-    const [rows] = await db.query('SELECT * FROM financial_data ORDER BY year DESC, month_number DESC');
+    const [rows] = await db.query('SELECT * FROM financial_data');
     return rows;
   },
 
