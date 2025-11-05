@@ -122,13 +122,13 @@ export const DepartmentController = {
         SELECT 
           a.appointment_id, 
           a.date, 
-          a.status,  
-          p.full_name AS patient_name, 
+          a.status,    
+          s.id,
+          s.department_id,
           s.full_name AS doctor_name
         FROM appointments a
-        LEFT JOIN patients p ON a.patient_id = p.id
-        LEFT JOIN staff s ON a.staff_id = s.id
-        WHERE a.department_id = ?
+        INNER JOIN staff s ON a.department_id = s.department_id
+        WHERE a.department_id = ${id}
         ORDER BY a.date DESC;
       `;
 
