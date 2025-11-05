@@ -1,7 +1,7 @@
 import FinancialModel from '../models/financialModel.js';
 
 const FinancialController = {
-  // GET /api/financial
+  // ✅ Get all data
   async getAll(req, res) {
     try {
       const data = await FinancialModel.getAll();
@@ -12,7 +12,7 @@ const FinancialController = {
     }
   },
 
-  // GET /api/financial/year/:year
+  // ✅ Get data by year
   async getByYear(req, res) {
     try {
       const { year } = req.params;
@@ -24,60 +24,42 @@ const FinancialController = {
     }
   },
 
-  // GET /api/financial/department/:name
+  // ✅ Get data by department
   async getByDepartment(req, res) {
-  try {
-    const { id } = req.params; // Extract department ID
-    const data = await FinancialModel.getByDepartment(id);
-
-    if (!data || data.length === 0) {
-      return res.status(404).json({ message: `No financial data found for department ID ${id}` });
+    try {
+      const { id } = req.params;
+      const data = await FinancialModel.getByDepartment(id);
+      if (!data.length)
+        return res.status(404).json({ message: `No financial data for department ID ${id}` });
+      res.status(200).json(data);
+    } catch (error) {
+      console.error('Error fetching data by department:', error);
+      res.status(500).json({ message: 'Server error while fetching department data' });
     }
+  },
 
-    res.status(200).json(data);
-  } catch (error) {
-    console.error('Error fetching data by department:', error);
-    res.status(500).json({ message: 'Server error while fetching department data' });
-  }
-},
-
-// ✅ Get yearly financial summary
+  // ✅ Yearly summary
   async getYearlySummary(req, res) {
     try {
       const { year } = req.params;
-
-      // Check if year is provided
-      if (!year) {
-        return res.status(400).json({ message: 'Year parameter is required' });
-      }
-
       const summary = await FinancialModel.getYearlySummary(year);
-
-      if (!summary) {
-        return res.status(404).json({ message: `No financial data found for year ${year}` });
-      }
-
-      res.status(200).json({
-        message: `Financial summary for year ${year}`,
-        data: summary,
-      });
+      if (!summary)
+        return res.status(404).json({ message: `No financial data for year ${year}` });
+      res.status(200).json({ message: `Yearly summary for ${year}`, data: summary });
     } catch (error) {
       console.error('Error fetching yearly summary:', error);
       res.status(500).json({ message: 'Server error', error });
     }
   },
+
   // ✅ Monthly summary
   async getMonthlySummary(req, res) {
     try {
       const { year } = req.params;
-      const summary = await FinancialModel.getMonthlySummary(year);
-      if (!summary.length)
-        return res.status(404).json({ message: `No monthly data found for year ${year}` });
-
-      res.status(200).json({
-        message: `Monthly financial summary for ${year}`,
-        data: summary,
-      });
+      const data = await FinancialModel.getMonthlySummary(year);
+      if (!data.length)
+        return res.status(404).json({ message: `No monthly data for ${year}` });
+      res.status(200).json({ message: `Monthly summary for ${year}`, data });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server error', error });
@@ -88,14 +70,52 @@ const FinancialController = {
   async getQuarterlySummary(req, res) {
     try {
       const { year } = req.params;
-      const summary = await FinancialModel.getQuarterlySummary(year);
-      if (!summary.length)
-        return res.status(404).json({ message: `No quarterly data found for year ${year}` });
+      const data = await FinancialModel.getQuarterlySummary(year);
+      if (!data.length)
+        return res.status(404).json({ message: `No quarterly data for ${year}` });
+      res.status(200).json({ message: `Quarterly summary for ${year}`, data });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
 
-      res.status(200).json({
-        message: `Quarterly financial summary for ${year}`,
-        data: summary,
-      });
+  // ✅ Department Yearly summary
+  async getDepartmentYearlySummary(req, res) {
+    try {
+      const { id, year } = req.params;
+      const summary = await FinancialModel.getDepartmentYearlySummary(id, year);
+      if (!summary)
+        return res.status(404).json({ message: `No yearly data for department ${id} in ${year}` });
+      res.status(200).json({ message: `Yearly summary for department ${id} in ${year}`, data: summary });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+
+  // ✅ Department Monthly summary
+  async getDepartmentMonthlySummary(req, res) {
+    try {
+      const { id, year } = req.params;
+      const data = await FinancialModel.getDepartmentMonthlySummary(id, year);
+      if (!data.length)
+        return res.status(404).json({ message: `No monthly data for department ${id} in ${year}` });
+      res.status(200).json({ message: `Monthly summary for department ${id} in ${year}`, data });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+
+  // ✅ Department Quarterly summary
+  async getDepartmentQuarterlySummary(req, res) {
+    try {
+      const { id, year } = req.params;
+      const data = await FinancialModel.getDepartmentQuarterlySummary(id, year);
+      if (!data.length)
+        return res.status(404).json({ message: `No quarterly data for department ${id} in ${year}` });
+      res.status(200).json({ message: `Quarterly summary for department ${id} in ${year}`, data });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server error', error });
