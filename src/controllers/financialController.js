@@ -1,42 +1,40 @@
-// src/controllers/financialController.js
-import { FinancialModel } from '../models/financialModel.js';
+import FinancialModel from '../models/financialModel.js';
 
-export const FinancialController = {
-  // ✅ Get all financial data
-  async getFinancialData(req, res) {
+const FinancialController = {
+  // GET /api/financial
+  async getAll(req, res) {
     try {
-      const financialData = await FinancialModel.getFinancialData();
-      res.json(financialData);
+      const data = await FinancialModel.getAll();
+      res.status(200).json(data);
     } catch (error) {
-      console.error('Error fetching financial data:', error);
-      res.status(500).json({ 
-        message: 'Failed to fetch financial data', 
-        error: error.message 
-      });
+      console.error('Error fetching all financial data:', error);
+      res.status(500).json({ message: 'Server error while fetching data' });
     }
   },
 
-  // ✅ Get financial data for a specific department
-  async getDepartmentFinancialData(req, res) {
+  // GET /api/financial/year/:year
+  async getByYear(req, res) {
     try {
-      const { departmentId } = req.params;
-      const financialData = await FinancialModel.getDepartmentFinancialData(departmentId);
-
-      if (!financialData) {
-        return res.status(404).json({ 
-          message: `Financial data for department ID ${departmentId} not found` 
-        });
-      }
-
-      res.json(financialData);
+      const { year } = req.params;
+      const data = await FinancialModel.getByYear(year);
+      res.status(200).json(data);
     } catch (error) {
-      console.error('Error fetching department financial data:', error);
-      res.status(500).json({ 
-        message: 'Failed to fetch department financial data', 
-        error: error.message 
-      });
+      console.error('Error fetching data by year:', error);
+      res.status(500).json({ message: 'Server error while fetching year data' });
     }
-  }
+  },
+
+  // GET /api/financial/department/:name
+  async getByDepartment(req, res) {
+    try {
+      const { name } = req.params;
+      const data = await FinancialModel.getByDepartment(name);
+      res.status(200).json(data);
+    } catch (error) {
+      console.error('Error fetching data by department:', error);
+      res.status(500).json({ message: 'Server error while fetching department data' });
+    }
+  },
 };
 
 export default FinancialController;
