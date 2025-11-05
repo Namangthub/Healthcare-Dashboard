@@ -11,8 +11,8 @@ export const DepartmentModel = {
           ds.nurses, 
           ds.support
         FROM departments d
-        LEFT JOIN department_staff ds ON d.id = ds.department_id
-        ORDER BY d.id;
+        LEFT JOIN department_staff ds ON d.department_id = ds.department_id
+        ORDER BY d.department_id;
       `;
       const [rows] = await db.query(query);
       return rows;
@@ -31,8 +31,8 @@ export const DepartmentModel = {
           ds.nurses, 
           ds.support
         FROM departments d
-        LEFT JOIN department_staff ds ON d.id = ds.department_id
-        WHERE d.id = ?;
+        LEFT JOIN department_staff ds ON d.department_id = ds.department_id
+        WHERE d.department_id = ?;
       `;
       const [rows] = await db.query(query, [id]);
       return rows.length > 0 ? rows[0] : null;
@@ -68,10 +68,10 @@ export const DepartmentModel = {
           qrr.rate AS readmission_rate,
           qrr.target AS readmission_target
         FROM departments d
-        LEFT JOIN quality_patient_satisfaction qps ON d.id = qps.department_id
-        LEFT JOIN quality_wait_times qwt ON d.id = qwt.department_id
-        LEFT JOIN quality_readmission_rates qrr ON d.id = qrr.department_id
-        WHERE d.id = ?;
+        LEFT JOIN quality_patient_satisfaction qps ON d.department_id = qps.department_id
+        LEFT JOIN quality_wait_times qwt ON d.department_id = qwt.department_id
+        LEFT JOIN quality_readmission_rates qrr ON d.department_id = qrr.department_id
+        WHERE d.department_id = ?;
       `;
       const [rows] = await db.query(query, [id]);
       return rows.length > 0 ? rows[0] : null;
