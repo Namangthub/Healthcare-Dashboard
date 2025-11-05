@@ -40,6 +40,67 @@ const FinancialController = {
     res.status(500).json({ message: 'Server error while fetching department data' });
   }
 },
+
+// ✅ Get yearly financial summary
+  async getYearlySummary(req, res) {
+    try {
+      const { year } = req.params;
+
+      // Check if year is provided
+      if (!year) {
+        return res.status(400).json({ message: 'Year parameter is required' });
+      }
+
+      const summary = await FinancialModel.getYearlySummary(year);
+
+      if (!summary) {
+        return res.status(404).json({ message: `No financial data found for year ${year}` });
+      }
+
+      res.status(200).json({
+        message: `Financial summary for year ${year}`,
+        data: summary,
+      });
+    } catch (error) {
+      console.error('Error fetching yearly summary:', error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+  // ✅ Monthly summary
+  async getMonthlySummary(req, res) {
+    try {
+      const { year } = req.params;
+      const summary = await FinancialModel.getMonthlySummary(year);
+      if (!summary.length)
+        return res.status(404).json({ message: `No monthly data found for year ${year}` });
+
+      res.status(200).json({
+        message: `Monthly financial summary for ${year}`,
+        data: summary,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+
+  // ✅ Quarterly summary
+  async getQuarterlySummary(req, res) {
+    try {
+      const { year } = req.params;
+      const summary = await FinancialModel.getQuarterlySummary(year);
+      if (!summary.length)
+        return res.status(404).json({ message: `No quarterly data found for year ${year}` });
+
+      res.status(200).json({
+        message: `Quarterly financial summary for ${year}`,
+        data: summary,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
 };
 
 export default FinancialController;
