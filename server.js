@@ -17,8 +17,6 @@ import inventoryRoutes from './src/routes/inventoryRoutes.js';
 import overviewRoutes from './src/routes/overviewRoutes.js';
 import demographicsRoutes from './src/routes/demographicsRoutes.js';
 import activitiesRoutes from './src/routes/activitiesRoutes.js';
-import financialQuarterlyRoutes from './src/routes/financialQuarterlyRoutes.js';
-import financialYearlyRoutes from './src/routes/financialYearlyRoutes.js';
 
 // Initialize environment variables
 dotenv.config();
@@ -51,8 +49,6 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/overview', overviewRoutes);
 app.use('/api/demographics', demographicsRoutes);
 app.use('/api/activities', activitiesRoutes);
-app.use('/api/financial/quarterly', financialQuarterlyRoutes);
-app.use('/api/financial/yearly', financialYearlyRoutes);
 
 
 // Centralized error handler
