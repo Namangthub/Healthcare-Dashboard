@@ -29,7 +29,7 @@ export default class PatientModel {
             JSON_OBJECT()
           ) AS vitals
         FROM patients p
-        LEFT JOIN departments d ON p.department_id = d.id
+        LEFT JOIN departments d ON p.department_id = d.department_id
         LEFT JOIN staff s ON p.doctor_id = s.id
         LEFT JOIN patient_vitals_current pv ON pv.patient_id = p.id
         ORDER BY p.id ASC;
@@ -70,7 +70,7 @@ export default class PatientModel {
             JSON_OBJECT()
           ) AS vitals
         FROM patients p
-        LEFT JOIN departments d ON p.department_id = d.id
+        LEFT JOIN departments d ON p.department_id = d.department_id
         LEFT JOIN staff s ON p.doctor_id = s.id
         LEFT JOIN patient_vitals_current pv ON pv.patient_id = p.id
         WHERE p.status != 'Discharged'
