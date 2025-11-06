@@ -1,13 +1,21 @@
 import express from 'express';
 import OverviewController from '../controllers/overviewController.js';
-import PatientController from '../controllers/patientController.js'; // ✅ Add this line
 
 const router = express.Router();
 
-// ✅ Get overview stats
+// ✅ Get complete overview
 router.get('/', OverviewController.getOverviewStatistics);
 
-// ✅ Get all patients
-router.get('/patients', PatientController.getAllPatients);
+// ✅ Get total patients
+router.get('/total_patients', OverviewController.getTotalPatients);
+
+// ✅ Get active patients
+router.get('/active_patients', OverviewController.getActivePatients);
+
+// ✅ Get total appointments
+router.get('/total_appointments', OverviewController.getTotalAppointments);
+
+// ✅ Get critical cases
+router.get('/critical_cases', OverviewController.getCriticalCases);
 
 export default router;
