@@ -7,7 +7,7 @@ const StaffModel = {
     const query = `
       SELECT s.*, d.name AS department_name
       FROM staff s
-      LEFT JOIN departments d ON s.department_id = d.id
+      LEFT JOIN departments d ON s.department_id = d.department_id
       ORDER BY s.id;
     `;
     const [result] = await db.query(query);
@@ -19,7 +19,7 @@ const StaffModel = {
     const query = `
       SELECT s.*, d.name AS department_name
       FROM staff s
-      LEFT JOIN departments d ON s.department_id = d.id
+      LEFT JOIN departments d ON s.department_id = d.department_id
       WHERE s.id = ?;
     `;
     const [result] = await db.query(query, [id]);
@@ -31,7 +31,7 @@ const StaffModel = {
     const query = `
       SELECT s.*, d.name AS department_name
       FROM staff s
-      LEFT JOIN departments d ON s.department_id = d.id
+      LEFT JOIN departments d ON s.department_id = d.department_id
       WHERE s.department_id = ?
       ORDER BY s.id;
     `;
@@ -75,7 +75,7 @@ const StaffModel = {
     const query = `
       SELECT d.name AS department, COUNT(s.id) AS count
       FROM staff s
-      JOIN departments d ON s.department_id = d.id
+      JOIN departments d ON s.department_id = d.department_id
       GROUP BY d.name
       ORDER BY count DESC;
     `;
@@ -88,7 +88,7 @@ const StaffModel = {
     const query = `
       SELECT p.*, d.name AS department_name
       FROM patients p
-      LEFT JOIN departments d ON p.department_id = d.id
+      LEFT JOIN departments d ON p.department_id = d.department_id
       WHERE p.doctor_id = ?
       ORDER BY p.id;
     `;

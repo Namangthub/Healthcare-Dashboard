@@ -20,19 +20,19 @@ export const QualityModel = {
       const deptSatisfactionQuery = `
         SELECT d.name AS department, qps.score, qps.responses
         FROM quality_patient_satisfaction qps
-        JOIN departments d ON d.id = qps.department_id
+        JOIN departments d ON d.department_id = qps.department_id
         ORDER BY qps.score DESC;
       `;
       const deptWaitTimesQuery = `
         SELECT d.name AS department, qwt.avg_wait, qwt.target
         FROM quality_wait_times qwt
-        JOIN departments d ON d.id = qwt.department_id
+        JOIN departments d ON d.department_id = qwt.department_id
         ORDER BY qwt.avg_wait ASC;
       `;
       const deptReadmissionQuery = `
         SELECT d.name AS department, qrr.rate, qrr.target
         FROM quality_readmission_rates qrr
-        JOIN departments d ON d.id = qrr.department_id
+        JOIN departments d ON d.department_id = qrr.department_id
         ORDER BY qrr.rate ASC;
       `;
 
@@ -78,7 +78,7 @@ export const QualityModel = {
     try {
       const query = `
         SELECT 
-          d.id AS department_id,
+          d.department_id AS department_id,
           d.name AS department_name,
           qps.score AS satisfaction_score,
           qps.responses AS satisfaction_responses,
@@ -87,10 +87,10 @@ export const QualityModel = {
           qrr.rate AS readmission_rate,
           qrr.target AS readmission_target
         FROM departments d
-        LEFT JOIN quality_patient_satisfaction qps ON d.id = qps.department_id
-        LEFT JOIN quality_wait_times qwt ON d.id = qwt.department_id
-        LEFT JOIN quality_readmission_rates qrr ON d.id = qrr.department_id
-        WHERE d.id = ?;
+        LEFT JOIN quality_patient_satisfaction qps ON d.department_id = qps.department_id
+        LEFT JOIN quality_wait_times qwt ON d.department_id = qwt.department_id
+        LEFT JOIN quality_readmission_rates qrr ON d.department_id = qrr.department_id
+        WHERE d.department_id = ?;
       `;
 
       const [result] = await db.query(query, [departmentId]);
