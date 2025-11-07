@@ -9,7 +9,8 @@ const StaffController = {
 
       const secureStaff = staff.map(member => ({
         id: member.id,
-        fullName: maskPII(member.full_name),
+        // fullName: maskPII(member.full_name),
+        fullName:member.full_name,
         role: member.role,
         department: member.department_name,
         status: member.status,
@@ -39,7 +40,8 @@ const StaffController = {
 
       const secureStaff = {
         id: staff.id,
-        fullName: maskPII(staff.full_name),
+        // fullName: maskPII(staff.full_name),
+        fullName:(staff.full_name),
         role: staff.role,
         department: staff.department_name,
         status: staff.status,
@@ -65,7 +67,8 @@ const StaffController = {
 
       const secureStaff = staff.map(member => ({
         id: member.id,
-        fullName: maskPII(member.full_name),
+        // fullName: maskPII(member.full_name),
+        fullName:member.full_name,
         role: member.role,
         department: member.department_name,
         status: member.status,
@@ -114,7 +117,7 @@ const StaffController = {
 
       const securePatients = patients.map(patient => ({
         id: patient.id,
-        fullName: maskPII(patient.full_name),
+        fullName: patient.full_name,
         age: patient.age,
         gender: patient.gender,
         department: patient.department_name,
