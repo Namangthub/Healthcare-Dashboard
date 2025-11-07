@@ -74,6 +74,22 @@ const FinancialModel = {
     return rows;
   },
 
+  // ✅ Get all department-wise financial summary
+async getAllDepartments() {
+  const [rows] = await db.query(`
+    SELECT 
+      department_id,
+      SUM(revenue) AS total_revenue,
+      SUM(expenses) AS total_expenses,
+      (SUM(revenue) - SUM(expenses)) AS total_profit
+    FROM financial_data
+    GROUP BY department_id
+    ORDER BY department_id
+  `);
+  return rows;
+},
+
+
   // ✅ Department-wise yearly summary
   async getDepartmentYearlySummary(department_id, year) {
     const [rows] = await db.query(`

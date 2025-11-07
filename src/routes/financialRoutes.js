@@ -15,5 +15,6 @@ router.get('/department/:id', FinancialController.getByDepartment);
 router.get('/department/:id/yearly/:year', FinancialController.getDepartmentYearlySummary);
 router.get('/department/:id/monthly/:year', FinancialController.getDepartmentMonthlySummary);
 router.get('/department/:id/quarterly/:year', FinancialController.getDepartmentQuarterlySummary);
+router.get('/department', FinancialController.getAllDepartments);
 
 export default router;

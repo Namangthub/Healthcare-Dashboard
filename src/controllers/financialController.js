@@ -80,6 +80,19 @@ const FinancialController = {
     }
   },
 
+  // ✅ Get all departments summary
+async getAllDepartments(req, res) {
+  try {
+    const data = await FinancialModel.getAllDepartments();
+    if (!data.length)
+      return res.status(404).json({ message: 'No department financial data found' });
+    res.status(200).json({ message: 'All departments financial summary', data });
+  } catch (error) {
+    console.error('Error fetching department summary:', error);
+    res.status(500).json({ message: 'Server error while fetching department summary' });
+  }
+},
+
   // ✅ Department Yearly summary
   async getDepartmentYearlySummary(req, res) {
     try {
