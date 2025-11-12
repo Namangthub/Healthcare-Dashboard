@@ -22,6 +22,15 @@ const FinancialModel = {
     return rows;
   },
 
+// ✅ Get distinct years from DB
+async getAvailableYears() {
+  const [rows] = await db.query(`
+    SELECT DISTINCT year FROM financial_data ORDER BY year DESC
+  `);
+  return rows;
+},
+
+
   // ✅ Get complete yearly summary
   async getYearlySummary(year) {
     const [rows] = await db.query(`

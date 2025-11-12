@@ -24,6 +24,18 @@ const FinancialController = {
     }
   },
 
+  // ✅ Get all available years from financial_data table
+async getAvailableYears(req, res) {
+  try {
+    const years = await FinancialModel.getAvailableYears();
+    if (!years.length) return res.status(404).json({ message: "No years found" });
+    res.status(200).json({ years: years.map((y) => y.year) });
+  } catch (error) {
+    console.error("Error fetching available years:", error);
+    res.status(500).json({ message: "Server error while fetching years" });
+  }
+},
+
   // ✅ Get data by department
   async getByDepartment(req, res) {
     try {

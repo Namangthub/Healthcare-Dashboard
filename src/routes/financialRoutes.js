@@ -9,6 +9,8 @@ router.get('/year/:year', FinancialController.getByYear);
 router.get('/summary/year/:year', FinancialController.getYearlySummary);
 router.get('/summary/monthly/year/:year', FinancialController.getMonthlySummary);
 router.get('/summary/quarter/year/:year', FinancialController.getQuarterlySummary);
+router.get('/years', FinancialController.getAvailableYears);
+
 
 // Department-specific routes
 router.get('/department/:id', FinancialController.getByDepartment);
