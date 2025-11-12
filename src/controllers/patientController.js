@@ -72,6 +72,55 @@ const PatientController = {
     }
   },
 
+async getPatientsByStatus(req, res) {
+  try {
+    let { status } = req.params;
+
+    // 🔁 Map frontend-friendly keywords to actual DB ENUM values
+    const statusMap = {
+      active: 'In Treatment',
+      scheduled: 'Scheduled',
+      critical: 'Critical',
+      discharged: 'Discharged',
+    };
+
+    const mappedStatus = statusMap[status.toLowerCase()] || status;
+
+    const patients = await PatientModel.getPatientsByStatus(mappedStatus);
+
+    const formatted = patients.map((p) => ({
+      id: p.id,
+      fullName: p.full_name || 'Unknown',
+      age: p.age,
+      gender: p.gender,
+      department: p.department_name || 'Unassigned',
+      doctor: p.doctor_name || 'Unassigned',
+      status: p.status,
+      severity: p.severity,
+      admissionDate: p.admission_date
+        ? new Date(p.admission_date).toISOString().split('T')[0]
+        : null,
+      lastVisit: p.last_visit
+        ? new Date(p.last_visit).toISOString().split('T')[0]
+        : null,
+      nextAppointment: p.next_appointment
+        ? new Date(p.next_appointment).toISOString().split('T')[0]
+        : null,
+      room: p.room || '',
+      diagnosis: p.diagnosis || '',
+      vitals:
+        typeof p.vitals === 'string' ? JSON.parse(p.vitals) : p.vitals || {},
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    console.error('❌ Error fetching patients by status:', error);
+    res.status(500).json({ message: 'Failed to fetch patients by status' });
+  }
+},
+
+
+
   // ✅ Rest of existing controller unchanged
   async getPatientById(req, res) {
     try {

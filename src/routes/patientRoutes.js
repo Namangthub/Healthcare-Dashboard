@@ -12,6 +12,8 @@ router.get('/demographics', PatientController.getDemographics);
 // ✅ Get all *active* patients only
 router.get('/active', PatientController.getActivePatients);
 
+router.get('/status/:status', PatientController.getPatientsByStatus);
+
 // ✅ Get all patients (includes discharged + active)
 router.get('/', PatientController.getAllPatients);
 
