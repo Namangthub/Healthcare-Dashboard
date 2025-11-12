@@ -34,42 +34,30 @@ export const DepartmentController = {
   },
  
   // Get department staff
-  async getDepartmentStaff(req, res) {
-    try {
-      const { id } = req.params;
-      const department = await DepartmentModel.getDepartmentById(id);
-      if (!department) return res.status(404).json({ message: `Department with id ${id} not found` });
- 
-      const query = `
-        SELECT s.id, s.first_name, s.last_name, s.full_name, s.role,
-               s.status, s.shift, s.specialty, s.experience, s.rating
-        FROM staff s
-        WHERE s.department_id = ?
-        ORDER BY s.role, s.last_name;
-      `;
- 
-      const [rows] = await db.query(query, [id]);
-      const staff = rows.map(s => ({
-        id: s.id,
-        firstName: s.first_name,
-        lastName: s.last_name,
-        fullName: s.full_name,
-        role: s.role,
-        status: s.status,
-        shift: s.shift,
-        specialty: s.specialty,
-        experience: Number(s.experience),
-        patients: Number(s.patients || 0),
-        rating: Number(s.rating || 0)
-      }));
- 
-      res.json(staff);
-    } catch (error) {
-      console.error('Error fetching department staff:', error);
-      res.status(500).json({ message: 'Failed to fetch department staff', error: error.message });
-    }
-  },
- 
+async getDepartmentStaff(req, res) {
+  try {
+    const { id } = req.params;
+    const query = `
+      SELECT role, COUNT(*) AS count
+      FROM staff
+      WHERE department_id = ?
+      GROUP BY role;
+    `;
+    const [rows] = await db.query(query, [id]);
+
+    // Convert array → object like { doctors: 3, nurses: 5, support: 2 }
+    const counts = { doctors: 0, nurses: 0, support: 0 };
+    rows.forEach(r => {
+      if (r.role.toLowerCase().includes('doctor')) counts.doctors = r.count;
+      else if (r.role.toLowerCase().includes('nurse')) counts.nurses = r.count;
+      else counts.support += r.count;
+    });
+
+    res.json(counts);
+  } catch (error) {
+    console.error('Error fetching department staff:', error);
+    res.status(500).json({ message: 'Failed to fetch department staff', error: error.message });}},
+
   // Get department patients
   async getDepartmentPatients(req, res) {
     try {

@@ -110,18 +110,16 @@ export const DepartmentModel = {
     }
   },
 
-  // 🆕 Get appointments for a department
+// 🆕 Get appointments for a department
 getDepartmentAppointments: async (id) => {
   try {
     const query = `
       SELECT 
-        a.appointment_id, 
-        a.patient_id, 
-        a.doctor_, 
-        a.department_id, 
-        a.date AS appointment_date, 
+        a.appointment_id,
+        a.date AS appointment_date,
         a.status,
-        p.full_name AS patient_name, 
+        a.patient_id,
+        p.full_name AS patient_name,
         s.full_name AS doctor_name
       FROM appointments a
       LEFT JOIN patients p ON a.patient_id = p.id
@@ -135,4 +133,5 @@ getDepartmentAppointments: async (id) => {
     throw new Error(`Error getting department appointments: ${error.message}`);
   }
 }
+
 };

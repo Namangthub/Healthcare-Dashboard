@@ -22,16 +22,15 @@ const FinancialModel = {
     return rows;
   },
 
-// ✅ Get distinct years from DB
-async getAvailableYears() {
-  const [rows] = await db.query(`
-    SELECT DISTINCT year FROM financial_data ORDER BY year DESC
-  `);
-  return rows;
-},
+  // ✅ Get distinct years
+  async getAvailableYears() {
+    const [rows] = await db.query(`
+      SELECT DISTINCT year FROM financial_data ORDER BY year DESC
+    `);
+    return rows;
+  },
 
-
-  // ✅ Get complete yearly summary
+  // ✅ Yearly summary (only yearly/total_yearly data)
   async getYearlySummary(year) {
     const [rows] = await db.query(`
       SELECT 
@@ -41,13 +40,14 @@ async getAvailableYears() {
         (SUM(revenue) - SUM(expenses)) AS total_profit
       FROM financial_data
       WHERE year = ?
+        AND period_type IN ('yearly', 'total_yearly')
       GROUP BY year
     `, [year]);
 
     return rows[0] || null;
   },
 
-  // ✅ Get monthly summary
+  // ✅ Monthly summary (for charts)
   async getMonthlySummary(year) {
     const [rows] = await db.query(`
       SELECT 
@@ -57,8 +57,10 @@ async getAvailableYears() {
         (SUM(revenue) - SUM(expenses)) AS total_profit
       FROM financial_data
       WHERE year = ?
+        AND period_type = 'monthly'
+        AND month_name IS NOT NULL
       GROUP BY month_name
-      ORDER BY FIELD(month_name, 
+      ORDER BY FIELD(month_name,
         'January','February','March','April','May','June',
         'July','August','September','October','November','December')
     `, [year]);
@@ -66,7 +68,7 @@ async getAvailableYears() {
     return rows;
   },
 
-  // ✅ Get quarterly summary
+  // ✅ Quarterly summary
   async getQuarterlySummary(year) {
     const [rows] = await db.query(`
       SELECT 
@@ -76,30 +78,32 @@ async getAvailableYears() {
         (SUM(revenue) - SUM(expenses)) AS total_profit
       FROM financial_data
       WHERE year = ?
+        AND period_type = 'quarterly'
+        AND quarter IS NOT NULL
       GROUP BY quarter
-      ORDER BY quarter
+      ORDER BY FIELD(quarter, 'Q1','Q2','Q3','Q4')
     `, [year]);
 
     return rows;
   },
 
-  // ✅ Get all department-wise financial summary
-async getAllDepartments() {
-  const [rows] = await db.query(`
-    SELECT 
-      department_id,
-      SUM(revenue) AS total_revenue,
-      SUM(expenses) AS total_expenses,
-      (SUM(revenue) - SUM(expenses)) AS total_profit
-    FROM financial_data
-    GROUP BY department_id
-    ORDER BY department_id
-  `);
-  return rows;
-},
+  // ✅ Department-wise overall summary
+  async getAllDepartments() {
+    const [rows] = await db.query(`
+      SELECT 
+        department_id,
+        SUM(revenue) AS total_revenue,
+        SUM(expenses) AS total_expenses,
+        (SUM(revenue) - SUM(expenses)) AS total_profit
+      FROM financial_data
+      WHERE period_type IN ('yearly', 'total_yearly')
+      GROUP BY department_id
+      ORDER BY department_id
+    `);
+    return rows;
+  },
 
-
-  // ✅ Department-wise yearly summary
+  // ✅ Department Yearly summary
   async getDepartmentYearlySummary(department_id, year) {
     const [rows] = await db.query(`
       SELECT 
@@ -109,13 +113,15 @@ async getAllDepartments() {
         SUM(expenses) AS total_expenses,
         (SUM(revenue) - SUM(expenses)) AS total_profit
       FROM financial_data
-      WHERE department_id = ? AND year = ?
+      WHERE department_id = ? 
+        AND year = ? 
+        AND period_type IN ('yearly', 'total_yearly')
       GROUP BY department_id, year
     `, [department_id, year]);
     return rows[0] || null;
   },
 
-  // ✅ Department-wise monthly summary
+  // ✅ Department Monthly summary
   async getDepartmentMonthlySummary(department_id, year) {
     const [rows] = await db.query(`
       SELECT 
@@ -124,7 +130,10 @@ async getAllDepartments() {
         SUM(expenses) AS total_expenses,
         (SUM(revenue) - SUM(expenses)) AS total_profit
       FROM financial_data
-      WHERE department_id = ? AND year = ?
+      WHERE department_id = ? 
+        AND year = ?
+        AND period_type = 'monthly'
+        AND month_name IS NOT NULL
       GROUP BY month_name
       ORDER BY FIELD(month_name,
         'January','February','March','April','May','June',
@@ -133,7 +142,7 @@ async getAllDepartments() {
     return rows;
   },
 
-  // ✅ Department-wise quarterly summary
+  // ✅ Department Quarterly summary
   async getDepartmentQuarterlySummary(department_id, year) {
     const [rows] = await db.query(`
       SELECT 
@@ -142,9 +151,12 @@ async getAllDepartments() {
         SUM(expenses) AS total_expenses,
         (SUM(revenue) - SUM(expenses)) AS total_profit
       FROM financial_data
-      WHERE department_id = ? AND year = ?
+      WHERE department_id = ? 
+        AND year = ?
+        AND period_type = 'quarterly'
+        AND quarter IS NOT NULL
       GROUP BY quarter
-      ORDER BY quarter
+      ORDER BY FIELD(quarter, 'Q1','Q2','Q3','Q4')
     `, [department_id, year]);
     return rows;
   },
